@@ -40,6 +40,7 @@ import com.collaborne.jsonschema.generator.model.Mappings;
 import com.collaborne.jsonschema.generator.pojo.PojoGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jackson.JacksonUtils;
 import com.github.fge.jackson.JsonNodeReader;
 import com.github.fge.jackson.jsonpointer.JsonPointerException;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
@@ -245,7 +246,7 @@ public class Main {
 		generator.setFeature(PojoGenerator.FEATURE_IGNORE_MISSING_TYPES, Boolean.TRUE);
 		generator.setOutputDirectory(outputDirectory);
 		
-		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper objectMapper = JacksonUtils.newMapper();
 		
 		Main main = new Main(objectMapper, generator);
 		main.addMappings(mappingFiles);
