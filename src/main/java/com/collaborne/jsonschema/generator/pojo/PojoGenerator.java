@@ -253,13 +253,14 @@ public class PojoGenerator extends AbstractGenerator {
 			// If the generator doesn't actually produce output (for example because it resolved the class differently),
 			// then we do not have to do anything further.
 			ClassName className;
-			Buffer buffer = new Buffer();
-			try (JavaWriter writer = new JavaWriter(new BufferedWriter(new OutputStreamWriter(buffer)))) {
-				className = typeGenerator.generate(codeGenerationContext, schema, writer);
-			}
+			try (Buffer buffer = new Buffer()) {
+				try (JavaWriter writer = new JavaWriter(new BufferedWriter(new OutputStreamWriter(buffer)))) {
+					className = typeGenerator.generate(codeGenerationContext, schema, writer);
+				}
 
-			if (buffer.size() > 0) {
-				writeSource(type, className, buffer);
+				if (buffer.size() > 0) {
+					writeSource(type, className, buffer);
+				}
 			}
 			
 			return className;
