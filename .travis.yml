@@ -1,9 +1,9 @@
 language: java
 script: "
 if [ ${TRAVIS_PULL_REQUEST} = 'false' ] && [ ${TRAVIS_BRANCH} = 'master' ]; then
-    mvn verify deploy --settings deploy-settings.xml
+    mvn verify deploy --settings deploy-settings.xml;
 else
-    mvn verify
+    mvn verify;
 fi"
 jdk:
   - oraclejdk8
