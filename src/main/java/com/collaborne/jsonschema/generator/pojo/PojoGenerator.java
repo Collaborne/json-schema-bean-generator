@@ -130,7 +130,7 @@ public class PojoGenerator extends AbstractGenerator {
 	@VisibleForTesting
 	protected static class Buffer extends ByteArrayOutputStream {
 		public InputStream getInputStream() {
-			return new ByteArrayInputStream(buf);
+			return new ByteArrayInputStream(buf, 0, count);
 		}
 	}
 	
