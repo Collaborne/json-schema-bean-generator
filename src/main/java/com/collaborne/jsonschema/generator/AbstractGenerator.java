@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.collaborne.jsonschema.generator.model.Mapping;
-import com.collaborne.jsonschema.generator.model.Mappings;
 import com.github.fge.jsonschema.core.load.SchemaLoader;
 
 public abstract class AbstractGenerator implements Generator {
