@@ -34,7 +34,7 @@ public class PojoArrayGenerator extends AbstractPojoTypeGenerator {
 		// XXX: for now we just basically ignore the other restrictions
 		if (schema.getNode().hasNonNull("items")) {
 			SchemaTree itemsSchema = schema.append(JsonPointer.of("items"));
-			URI elementUri = schema.getLoadingRef().toURI();
+			URI elementUri = schema.getLoadingRef().toURI().resolve("#" + itemsSchema.getPointer().toString());;
 			AtomicReference<ClassName> elementClassName = new AtomicReference<>();
 			visitSchema(elementUri, itemsSchema, new SchemaVisitor<CodeGenerationException>() {
 				@Override
