@@ -232,6 +232,7 @@ public class PojoGenerator extends AbstractGenerator {
 	protected ClassName generateInternal(URI type, Mapping mapping) throws CodeGenerationException {
 		// If the mapping wants a primitive type or existing type, do that (ignoring whatever the schema does)
 		if (isPrimitive(mapping.getClassName()) || isExistingClass(mapping.getClassName())) {
+			logger.debug("{}: Mapping to existing class/type {}", type, mapping.getClassName());
 			return mapping.getClassName();
 		}
 
