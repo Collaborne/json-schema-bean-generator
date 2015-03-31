@@ -24,7 +24,7 @@ import com.collaborne.jsonschema.generator.model.Mapping;
 import com.github.fge.jsonschema.core.load.SchemaLoader;
 
 public interface Generator {
-	static class Feature<T> {
+	public static class Feature<T> {
 		private final String uri;
 		private final Class<T> requiredType;
 		private final T defaultValue;
