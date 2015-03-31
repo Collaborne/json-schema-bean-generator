@@ -1,5 +1,5 @@
 language: java
-after_success: "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && [ ${TRAVIS_BRANCH} = 'master' ] && mvn deploy --settings deploy-settings.xml"
+after_success: "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && [ ${TRAVIS_BRANCH} = 'master' ] && mvn deploy -DskipTests=true -B --settings deploy-settings.xml"
 jdk:
   - oraclejdk8
 env:
