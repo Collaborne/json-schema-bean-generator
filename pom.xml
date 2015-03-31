@@ -22,29 +22,29 @@
 	<artifactId>json-schema-bean-generator</artifactId>
 	<version>1.0-SNAPSHOT</version>
 
-        <parent>
-                <groupId>org.sonatype.oss</groupId>
-                <artifactId>oss-parent</artifactId>
-                <version>7</version>
-        </parent>
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
 
-        <name>JSON Schema Bean Generator</name>
-        <description>Create bean-ish code from JSON Schemas</description>
-        <url>https://github.com/Collaborne/json-schema-bean-generator</url>
+	<name>JSON Schema Bean Generator</name>
+	<description>Create bean-ish code from JSON Schemas</description>
+	<url>https://github.com/Collaborne/json-schema-bean-generator</url>
 
-        <scm>
-                <url>https://github.com/Collaborne/json-schema-bean-generator</url>
-                <connection>scm:git:git@github.com:git://github.com/Collaborne/json-schema-bean-generator.git</connection>
-                <developerConnection>scm:git:git@github.com:git://github.com/Collaborne/json-schema-bean-generator.git</developerConnection>
-        </scm>
-        <issueManagement>
-                <system>github</system>
-                <url>https://github.com/Collaborne/json-schema-bean-generator/issues/</url>
-        </issueManagement>
-        <ciManagement>
-                <system>Travis</system>
-                <url>https://travis-ci.org/Collaborne/json-schema-bean-generator/</url>
-        </ciManagement>
+	<scm>
+		<url>https://github.com/Collaborne/json-schema-bean-generator</url>
+		<connection>scm:git:git@github.com:git://github.com/Collaborne/json-schema-bean-generator.git</connection>
+		<developerConnection>scm:git:git@github.com:git://github.com/Collaborne/json-schema-bean-generator.git</developerConnection>
+	</scm>
+	<issueManagement>
+		<system>github</system>
+		<url>https://github.com/Collaborne/json-schema-bean-generator/issues/</url>
+	</issueManagement>
+	<ciManagement>
+		<system>Travis</system>
+		<url>https://travis-ci.org/Collaborne/json-schema-bean-generator/</url>
+	</ciManagement>
 
 	<inceptionYear>2015</inceptionYear>
 
@@ -52,7 +52,7 @@
 		<name>Collaborne B.V.</name>
 		<url>http://github.com/Collaborne</url>
 	</organization>
-	
+
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -60,21 +60,21 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-  	
-  	<developers>
-  		<developer>
-  			<id>ankon</id>
-  			<name>Andreas Kohn</name>
-  			<url>http://github.com/ankon</url>
-  			<organization>Collaborne B.V.</organization>
-  			<roles>
-  				<role>architect</role>
-  				<role>developer</role>
-  			</roles>
-  			<timezone>Europe/Amsterdam</timezone>
-  		</developer>
-  	</developers>
-  	
+
+	<developers>
+		<developer>
+			<id>ankon</id>
+			<name>Andreas Kohn</name>
+			<url>http://github.com/ankon</url>
+			<organization>Collaborne B.V.</organization>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>Europe/Amsterdam</timezone>
+		</developer>
+	</developers>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -119,7 +119,7 @@
 
 		</plugins>
 	</build>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>com.github.fge</groupId>
