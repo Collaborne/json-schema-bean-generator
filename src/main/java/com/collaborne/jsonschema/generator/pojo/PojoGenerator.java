@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import javax.inject.Inject;
 
@@ -109,6 +110,9 @@ public class PojoGenerator extends AbstractGenerator {
 	public static final Feature<AnonymousClassNameGenerator> FEATURE_CLASS_NAME_GENERATOR = new Feature<>("http://json-schema-bean-generator.collaborne.com/features/LATEST/pojo/class-name-generator", AnonymousClassNameGenerator.class, AnonymousClassNameGenerator.CAMEL_CASE);
 	/** Whether to ignore constraints (enum-ness, min/max value, etc) on non-"object" types */
 	public static final Feature<Boolean> FEATURE_USE_SIMPLE_PLAIN_TYPES = new Feature<>("http://json-schema-bean-generator.collaborne.com/features/LATEST/pojo/simple-plain-types", Boolean.class, Boolean.TRUE);	
+
+	/** Sentinel to detect a recursive generation early */
+	private static final ClassName IN_PROGRESS = new ClassName("internal", "IN_PROGRESS");
 	
 	private static class SimplePojoTypeGenerator implements PojoTypeGenerator {
 		private final ClassName className;
@@ -146,6 +150,8 @@ public class PojoGenerator extends AbstractGenerator {
 	private final Map<String, PojoTypeGenerator> typeGenerators = new HashMap<>();
 	private final Map<URI, ClassName> generatedClassNames = new HashMap<>();
 	private final Set<URI> nullTypes = new HashSet<>();
+	/** Stack of calls to {@link #generateInternal(URI, Mapping)}, used for logging */
+	private final Stack<URI> generationStack = new Stack<>();
 	
 	@Inject
 	@VisibleForTesting
@@ -170,38 +176,49 @@ public class PojoGenerator extends AbstractGenerator {
 		if (nullTypes.contains(type)) {
 			return null;
 		}
-		
-		ClassName generatedClassName = generatedClassNames.get(type);
-		if (generatedClassName != null) {
-			return generatedClassName;
-		}
-		
-		// Find or create the mapping for this type
-		Mapping mapping = getMapping(type);
-		if (mapping == null) {
-			logger.debug("{}: No mapping defined", type);
-			mapping = generateMapping(type);
-			addMapping(type, mapping);
-		}
-		
+
+		generationStack.push(type);
 		try {
-			generatedClassName = generateInternal(type, mapping);
-		} catch (CodeGenerationException e) {
-			if (getFeature(FEATURE_IGNORE_MISSING_TYPES)) {
-				// Assume that a class would have been created.
-				generatedClassName = mapping.getClassName();
-				logger.warn("{}: Ignoring creation failure, assuming class {} would have been created", generatedClassName, e);
-			} else {
-				throw e;
+			ClassName generatedClassName = generatedClassNames.get(type);
+			if (generatedClassName != null) {
+				if (IN_PROGRESS.equals(generatedClassName)) {
+					throw new CodeGenerationException(type, "Recursive class generation: " + generationStack);
+				}
+				return generatedClassName;
 			}
+			// Mark as in-progress
+			generatedClassNames.put(type, IN_PROGRESS);
+
+			// Find or create the mapping for this type
+			Mapping mapping = getMapping(type);
+			if (mapping == null) {
+				logger.debug("{}: No mapping defined", type);
+				mapping = generateMapping(type);
+				addMapping(type, mapping);
+			}
+
+			try {
+				generatedClassName = generateInternal(type, mapping);
+			} catch (CodeGenerationException e) {
+				if (getFeature(FEATURE_IGNORE_MISSING_TYPES)) {
+					// Assume that a class would have been created.
+					generatedClassName = mapping.getClassName();
+					logger.warn("{}: Ignoring creation failure, assuming class {} would have been created", generatedClassName, e);
+				} else {
+					throw e;
+				}
+			}
+
+			if (generatedClassName == null) {
+				nullTypes.add(type);
+				generatedClassNames.remove(type);
+			} else {
+				generatedClassNames.put(type, generatedClassName);
+			}
+			return generatedClassName;
+		} finally {
+			generationStack.pop();
 		}
-		
-		if (generatedClassName == null) {
-			nullTypes.add(type);
-		} else {
-			generatedClassNames.put(type, generatedClassName);
-		}
-		return generatedClassName;
 	}
 	
 	/**
