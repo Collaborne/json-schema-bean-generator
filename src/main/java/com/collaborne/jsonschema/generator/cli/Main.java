@@ -42,8 +42,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jackson.JacksonUtils;
 import com.github.fge.jackson.JsonNodeReader;
-import com.github.fge.jackson.jsonpointer.JsonPointerException;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.load.SchemaLoader;
 import com.github.fge.jsonschema.core.load.configuration.LoadingConfiguration;
 import com.github.fge.jsonschema.core.load.configuration.LoadingConfigurationBuilder;
@@ -66,7 +64,7 @@ public class Main {
 	}
 	
 	@VisibleForTesting
-	protected void run(Path baseDirectory, URI rootUri) throws IOException, ProcessingException, CodeGenerationException {
+	protected void run(Path baseDirectory, URI rootUri) throws IOException, CodeGenerationException {
 		// Load the schemas
 		// XXX: for testing we configure the generator from the outside
 		if (schemaFiles.isEmpty()) {
@@ -146,7 +144,7 @@ public class Main {
 	}
 	
 	@VisibleForTesting
-	protected SchemaLoader loadSchemas(URI rootUri, Path baseDirectory, List<Path> schemaFiles) throws ProcessingException, IOException {
+	protected SchemaLoader loadSchemas(URI rootUri, Path baseDirectory, List<Path> schemaFiles) throws IOException {
 		URI baseDirectoryUri = baseDirectory.toAbsolutePath().normalize().toUri();
 		
 		// We're not adding a path redirection here, because that changes the path of the loaded schemas to the redirected location.
@@ -193,7 +191,7 @@ public class Main {
 		return new SchemaLoader(loadingConfigurationBuilder.freeze());
 	}
 	
-	public static void main(String... args) throws URISyntaxException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, ProcessingException, JsonPointerException, CodeGenerationException {
+	public static void main(String... args) throws URISyntaxException, ClassNotFoundException, IOException, CodeGenerationException {
 		List<Path> schemaFiles = new ArrayList<>();
 		List<Path> mappingFiles = new ArrayList<>();
 		
