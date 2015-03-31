@@ -34,8 +34,8 @@
 
 	<scm>
 		<url>https://github.com/Collaborne/json-schema-bean-generator</url>
-		<connection>scm:git:git@github.com:git://github.com/Collaborne/json-schema-bean-generator.git</connection>
-		<developerConnection>scm:git:git@github.com:git://github.com/Collaborne/json-schema-bean-generator.git</developerConnection>
+		<connection>scm:git:https://github.com/Collaborne/json-schema-bean-generator.git</connection>
+		<developerConnection>scm:git:https://github.com/Collaborne/json-schema-bean-generator.git</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>github</system>
