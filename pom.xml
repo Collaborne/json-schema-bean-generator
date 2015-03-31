@@ -97,7 +97,7 @@
 				<configuration>
 					<header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
 					<properties>
-						<owner>Collaborne B.V.</owner>
+						<owner>${project.organization.name}</owner>
 						<email>opensource@collaborne.com</email>
 					</properties>
 					<excludes>
