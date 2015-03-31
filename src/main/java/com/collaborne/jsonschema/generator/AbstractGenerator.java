@@ -20,10 +20,15 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.collaborne.jsonschema.generator.model.Mapping;
 import com.github.fge.jsonschema.core.load.SchemaLoader;
 
 public abstract class AbstractGenerator implements Generator {
+	private final Logger logger = LoggerFactory.getLogger(AbstractGenerator.class);
+
 	private final Map<String, Object> features = new HashMap<>();
 	private Map<URI, Mapping> mappings = new HashMap<>();
 	private Path outputDirectory;
@@ -41,6 +46,9 @@ public abstract class AbstractGenerator implements Generator {
 
 	@Override
 	public void addMapping(URI type, Mapping mapping) {
+		if (!type.isAbsolute()) {
+			logger.warn("{}: Adding mapping for non-absolute type");
+		}
 		mappings.put(type, mapping);
 	}
 	
