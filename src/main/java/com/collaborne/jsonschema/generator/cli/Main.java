@@ -90,19 +90,16 @@ public class Main {
 	}
 	
 	@VisibleForTesting
-	protected void addSchemas(List<Path> schemaFiles) {
-		this.schemaFiles.addAll(schemaFiles);
+	protected void addSchema(Path schemaFile) {
+		this.schemaFiles.add(schemaFile);
 	}
 	
 	@VisibleForTesting
-	protected void addMappings(List<Path> mappingFiles) throws IOException {
-		// Process the mapping files
-		for (Path mappingFile : mappingFiles) {
-			try (InputStream input = Files.newInputStream(mappingFile)) {
-				Mappings mappings = objectMapper.readValue(input, Mappings.class);
-				
-				addMappings(mappings);
-			}
+	protected void addMappings(Path mappingFile) throws IOException {
+		try (InputStream input = Files.newInputStream(mappingFile)) {
+			Mappings mappings = objectMapper.readValue(input, Mappings.class);
+
+			addMappings(mappings);
 		}
 	}
 	
@@ -247,8 +244,12 @@ public class Main {
 		ObjectMapper objectMapper = JacksonUtils.newMapper();
 		
 		Main main = new Main(objectMapper, generator);
-		main.addMappings(mappingFiles);
-		main.addSchemas(schemaFiles);
+		for (Path mappingFile : mappingFiles) {
+			main.addMappings(mappingFile);
+		}
+		for (Path schemaFile : schemaFiles) {
+			main.addSchema(schemaFile);
+		}
 		main.run(baseDirectory, rootUri);
 		
 		System.exit(0);
