@@ -71,7 +71,7 @@ public class Main {
 			throw new IllegalStateException("No schema files provided");
 		}
 		
-		SchemaLoader schemas = loadSchemas(rootUri, baseDirectory, schemaFiles);
+		SchemaLoader schemas = createSchemaLoader(rootUri, baseDirectory, schemaFiles);
 		generator.setSchemaLoader(schemas);
 		
 		// Now, start the generation by asking for the types implied in the schemas (i.e. with an empty pointer):
@@ -141,7 +141,7 @@ public class Main {
 	}
 	
 	@VisibleForTesting
-	protected SchemaLoader loadSchemas(URI rootUri, Path baseDirectory, List<Path> schemaFiles) throws IOException {
+	protected SchemaLoader createSchemaLoader(URI rootUri, Path baseDirectory, List<Path> schemaFiles) throws IOException {
 		URI baseDirectoryUri = baseDirectory.toAbsolutePath().normalize().toUri();
 		
 		// We're not adding a path redirection here, because that changes the path of the loaded schemas to the redirected location.
