@@ -21,6 +21,7 @@ import java.util.List;
 public class Mappings {
 	private List<Mapping> mappings;
 	private URI baseUri;
+	private String defaultPackageName;
 	
 	public List<Mapping> getMappings() {
 		return mappings;
@@ -36,5 +37,13 @@ public class Mappings {
 	
 	public void setBaseUri(URI baseUri) {
 		this.baseUri = baseUri;
+	}
+
+	public String getDefaultPackageName() {
+		return defaultPackageName;
+	}
+
+	public void setDefaultPackageName(String defaultPackageName) {
+		this.defaultPackageName = defaultPackageName;
 	}
 }

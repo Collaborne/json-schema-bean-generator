@@ -31,6 +31,7 @@ public abstract class AbstractGenerator implements Generator {
 
 	private final Map<String, Object> features = new HashMap<>();
 	private Map<URI, Mapping> mappings = new HashMap<>();
+	private Map<URI, String> defaultPackageNames = new HashMap<>();
 	private Path outputDirectory;
 	private SchemaLoader schemaLoader;
 
@@ -51,7 +52,31 @@ public abstract class AbstractGenerator implements Generator {
 		}
 		mappings.put(type, mapping);
 	}
-	
+
+	@Override
+	public void addDefaultPackageName(URI baseUri, String packageName) {
+		defaultPackageNames.put(baseUri, packageName);
+	}
+
+	/**
+	 * Get the default package name for the given type.
+	 *
+	 * @param type
+	 * @return
+	 */
+	public String getDefaultPackageName(URI type) {
+		String defaultPackageName = null;
+		// FIXME: Look up the type in the defaultPackageNames, which requires removing pointer parts
+		//        until we find it.
+		// XXX: We likely should also allow defining default package names for URIs with up to no
+		//      path elements.
+		if (defaultPackageName == null) {
+			defaultPackageName = getFeature(FEATURE_DEFAULT_PACKAGE_NAME);
+			logger.warn("{}: Using package name {}", type, defaultPackageName);
+		}
+		return defaultPackageName;
+	}
+
 	protected Path getOutputDirectory() {
 		return outputDirectory;
 	}

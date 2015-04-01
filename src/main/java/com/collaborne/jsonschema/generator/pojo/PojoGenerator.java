@@ -55,8 +55,6 @@ import com.google.common.annotations.VisibleForTesting;
 
 // XXX: URI vs JsonRef vs SchemaKey
 public class PojoGenerator extends AbstractGenerator {
-	/** The name of the package to use for anonymous types */
-	public static final Feature<String> FEATURE_DEFAULT_PACKAGE_NAME = new Feature<>("http://json-schema-bean-generator.collaborne.com/features/LATEST/pojo/package-name", String.class, "anonymous");
 	/** Attempt to write code even when there are some types missing */
 	public static final Feature<Boolean> FEATURE_IGNORE_MISSING_TYPES = new Feature<>("http://json-schema-bean-generator.collaborne.com/features/LATEST/pojo/ignore-missing-types", Boolean.class, Boolean.FALSE);
 
@@ -372,9 +370,7 @@ public class PojoGenerator extends AbstractGenerator {
 		// In theory the type could point to a schema that has an 'id' value, which is
 		// fairly easy to abuse. So, we generate a name based on the position in the 
 		// tree, if the user doesn't like it they can just provide a specific mapping for it.
-		// TODO: would be nice to use the same package as the schema that lead to the generation of that type.
-		// FIXME: should be global setting or such, definitely a constant though
-		String packageName = getFeature(FEATURE_DEFAULT_PACKAGE_NAME);
+		String packageName = getDefaultPackageName(type);
 		// One cannot "import" packages from the default package, so we need them to be somewhere ... 
 		assert packageName != null && !packageName.isEmpty();
 		

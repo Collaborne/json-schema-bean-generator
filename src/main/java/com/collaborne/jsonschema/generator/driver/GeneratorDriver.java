@@ -129,7 +129,19 @@ public class GeneratorDriver {
 			} else {
 				target = mapping.getTarget();
 			}
-			generator.addMapping(target, mapping);			
+			generator.addMapping(target, mapping);
+		}
+
+		String defaultPackageName = mappings.getDefaultPackageName();
+		if (defaultPackageName != null && !defaultPackageName.isEmpty()) {
+			URI baseUri = mappings.getBaseUri();
+			if (baseUri == null) {
+				// XXX: same problem as above, we need to know where the mapping file itself
+				//      is to produce a reasonable default.
+				logger.warn("Missing baseUri for {}", defaultPackageName);
+			} else {
+				generator.addDefaultPackageName(null, defaultPackageName);
+			}
 		}
 	}
 	

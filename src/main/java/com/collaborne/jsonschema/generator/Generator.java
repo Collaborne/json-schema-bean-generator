@@ -19,6 +19,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Map;
 
+import com.collaborne.jsonschema.generator.Generator.Feature;
 import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.model.Mapping;
 import com.github.fge.jsonschema.core.load.SchemaLoader;
@@ -59,6 +60,9 @@ public interface Generator {
 			return requiredType.cast(v);
 		}
 	}
+
+	/** The name of the package to use for anonymous types */
+	public static final Feature<String> FEATURE_DEFAULT_PACKAGE_NAME = new Feature<>("http://json-schema-bean-generator.collaborne.com/features/LATEST/package-name", String.class, "anonymous");
 	
 	/**
 	 * Set the directory for any output
@@ -73,7 +77,10 @@ public interface Generator {
 
 	// TODO: builder
 	void setSchemaLoader(SchemaLoader schemaLoader);
-	
+
+	// TODO: builder
+	void addDefaultPackageName(URI baseUri, String packageName);
+
 	/**
 	 * Generate code for the given {@code type}, and return the class name of it.
 	 * 
