@@ -91,6 +91,10 @@ public class JavaWriter implements Closeable {
 			return;
 		}
 		
+		if (importedClassNames.size() == 1) {
+			// First import, write a new line
+			writeEmptyLine();
+		}
 		writeImportForce(fqcn);
 	}
 	
@@ -156,6 +160,7 @@ public class JavaWriter implements Closeable {
 	
 	public void writeClassStart(ClassName fqcn, Kind kind, Visibility visibility) throws IOException {
 		// XXX: visibility in the mapping? options ("all public", "all minimum?")
+		writeEmptyLine();
 		writeIndent();
 		writer.write(visibility.getValue());
 		writer.write(" ");
@@ -188,6 +193,7 @@ public class JavaWriter implements Closeable {
 	// FIXME: declaration is really weird, should introduce a dedicated type for (ClassName, String)
 	public void writeMethodBodyStart(Visibility visibility, ClassName className, String methodName, Object... typesAndValues) throws IOException {
 		assert typesAndValues == null || typesAndValues.length % 2 == 0;
+		writeEmptyLine();
 		writeIndent();
 		writer.write(visibility.getValue());
 		writer.write(" ");
@@ -237,5 +243,9 @@ public class JavaWriter implements Closeable {
 	protected void writeClassName(ClassName fqcn) throws IOException {
 		String className = getAvailableShortName(fqcn);
 		writer.write(className);
+	}
+
+	protected void writeEmptyLine() throws IOException {
+		writer.write('\n');
 	}
 }
