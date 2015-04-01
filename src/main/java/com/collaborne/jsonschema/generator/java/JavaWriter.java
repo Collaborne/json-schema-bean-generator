@@ -37,6 +37,7 @@ public class JavaWriter implements Closeable {
 	/** Map of all imports: package.rawClassName to rawClassName */
 	private Map<String, String> importedClassNames = new HashMap<>();
 	private boolean importsFlushed = false;
+	private boolean skipNextEmptyLine = false;
 	
 	public JavaWriter(BufferedWriter writer) {
 		this.writer = writer;
@@ -297,6 +298,26 @@ public class JavaWriter implements Closeable {
 	}
 
 	protected void writeEmptyLine() throws IOException {
+		if (skipNextEmptyLine) {
+			skipNextEmptyLine = true;
+			return;
+		}
+
 		writer.write('\n');
+	}
+
+	public void writeJavadoc(String... lines) throws IOException {
+		writeEmptyLine();
+		writeIndent();
+		writer.write("/**\n");
+		for (String line : lines) {
+			writeIndent();
+			writer.write(" * ");
+			writer.write(line);
+			writer.write("\n");
+		}
+		writeIndent();
+		writer.write(" */\n");
+		skipNextEmptyLine = true;
 	}
 }
