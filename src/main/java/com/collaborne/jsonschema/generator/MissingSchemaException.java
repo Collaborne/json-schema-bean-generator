@@ -23,4 +23,8 @@ public class MissingSchemaException extends CodeGenerationException {
 	public MissingSchemaException(URI type) {
 		super(type, null, null);
 	}
+
+	public MissingSchemaException(URI type, Throwable cause) {
+		super(type, null, cause);
+	}
 }

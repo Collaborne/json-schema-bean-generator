@@ -32,7 +32,6 @@ import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.model.Mapping;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JsonNodeReader;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.load.SchemaLoader;
 import com.github.fge.jsonschema.core.tree.SchemaTree;
 
@@ -61,14 +60,9 @@ public class PojoGeneratorTest {
 			protected void writeSource(URI type, ClassName className, Buffer buffer) throws java.io.IOException {
 				writeSourceCalled.set(true);
 			}
-
-			@Override
-			protected SchemaTree getSchema(SchemaLoader schemaLoader, URI uri) throws ProcessingException {
-				return schema;
-			}
 		};
 
-		ClassName className = generator.generateInternal(mapping.getTarget(), mapping);
+		ClassName className = generator.generateInternal(mapping.getTarget(), schema, mapping);
 		assertEquals(mapping.getClassName(), className);
 		assertFalse(writeSourceCalled.get());
 	}
@@ -84,14 +78,9 @@ public class PojoGeneratorTest {
 			protected void writeSource(URI type, ClassName className, Buffer buffer) throws java.io.IOException {
 				writeSourceCalled.set(true);
 			}
-
-			@Override
-			protected SchemaTree getSchema(SchemaLoader schemaLoader, URI uri) throws ProcessingException {
-				return schema;
-			}
 		};
 
-		ClassName className = generator.generateInternal(mapping.getTarget(), mapping);
+		ClassName className = generator.generateInternal(mapping.getTarget(), schema, mapping);
 		assertEquals(mapping.getClassName(), className);
 		assertFalse(writeSourceCalled.get());
 	}

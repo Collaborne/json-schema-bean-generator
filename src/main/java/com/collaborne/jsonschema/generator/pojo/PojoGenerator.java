@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import com.collaborne.jsonschema.generator.AbstractGenerator;
 import com.collaborne.jsonschema.generator.CodeGenerationException;
+import com.collaborne.jsonschema.generator.InvalidRefException;
 import com.collaborne.jsonschema.generator.MissingSchemaException;
 import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
@@ -172,50 +173,87 @@ public class PojoGenerator extends AbstractGenerator {
 	}
 	
 	@Override
-	public ClassName generate(URI type) throws CodeGenerationException {
-		if (nullTypes.contains(type)) {
-			return null;
-		}
+	public ClassName generate(URI wantedType) throws CodeGenerationException {
+		// Work out the schema and mapping for the given type. There is one complexity involved
+		// here: the type might be an
+		// "alias", i.e. the schema only contains a "$ref" to another place. In this case we want to follow
+		// the ref, until we find a mapping or an actual schema.
+		// At any point in this search we may find that we already processed this type (either generated a class,
+		// or could use an existing one.)
 
-		generationStack.push(type);
-		try {
+		// Find or create the mapping for this type
+		URI type = wantedType;
+		Mapping mapping;
+		SchemaTree schema;
+		do {
+			// Check if we have processed this type
+			if (nullTypes.contains(type)) {
+				return null;
+			}
 			ClassName generatedClassName = generatedClassNames.get(type);
 			if (generatedClassName != null) {
 				if (IN_PROGRESS.equals(generatedClassName)) {
-					throw new CodeGenerationException(type, "Recursive class generation: " + generationStack);
+					// XXX: The stack here doesn't contain the intermediate steps
+					throw new CodeGenerationException(type, "Recursion detection while generating code for " + wantedType + ": " + generationStack);
 				}
 				return generatedClassName;
 			}
-			// Mark as in-progress
-			generatedClassNames.put(type, IN_PROGRESS);
 
-			// Find or create the mapping for this type
-			Mapping mapping = getMapping(type);
-			if (mapping == null) {
-				logger.debug("{}: No mapping defined", type);
-				mapping = generateMapping(type);
-				addMapping(type, mapping);
+			mapping = getMapping(type);
+			// Look up the schema, it should exist.
+			try {
+				schema = getSchema(getSchemaLoader(), type);
+				if (schema == null || schema.getNode() == null) {
+					throw new MissingSchemaException(type);
+				}
+			} catch (ProcessingException e) {
+				throw new MissingSchemaException(type, e);
 			}
 
+			if (mapping == null) {
+				if (schema.getNode().hasNonNull("$ref")) {
+					// Schema is actually a $ref, follow it
+					String ref = schema.getNode().get("$ref").textValue();
+					logger.debug("{}: Following $ref to {}", type, ref);
+					// This URI can be relative to the current schema, so we need to properly
+					// resolve it here.
+					// FIXME: same loading ref problem as everywhere else!
+					type = schema.getLoadingRef().toURI().resolve(ref);
+				} else {
+					// Schema is not a $ref, and we do not have a specific mapping
+					// for it.
+					// Generate one.
+					logger.debug("{}: Defining new mapping", type);
+					mapping = generateMapping(type);
+					addMapping(type, mapping);
+				}
+			}
+		} while (mapping == null);
+
+		ClassName result;
+		// Mark the type as "in progress", as we're now going to actually work with it.
+		generationStack.push(type);
+		try {
+			generatedClassNames.put(type, IN_PROGRESS);
 			try {
-				generatedClassName = generateInternal(type, mapping);
+				result = generateInternal(type, schema, mapping);
 			} catch (CodeGenerationException e) {
 				if (getFeature(FEATURE_IGNORE_MISSING_TYPES)) {
 					// Assume that a class would have been created.
-					generatedClassName = mapping.getClassName();
-					logger.warn("{}: Ignoring creation failure, assuming class {} would have been created", generatedClassName, e);
+					result = mapping.getClassName();
+					logger.warn("{}: Ignoring creation failure, assuming class {} would have been created", result, e);
 				} else {
 					throw e;
 				}
 			}
 
-			if (generatedClassName == null) {
+			if (result == null) {
 				nullTypes.add(type);
 				generatedClassNames.remove(type);
 			} else {
-				generatedClassNames.put(type, generatedClassName);
+				generatedClassNames.put(type, result);
 			}
-			return generatedClassName;
+			return result;
 		} finally {
 			generationStack.pop();
 		}
@@ -225,24 +263,19 @@ public class PojoGenerator extends AbstractGenerator {
 	 * Generate code for the {@code type} using the provided {@code mapping}.
 	 * 
 	 * @param type
+	 * @param schema
 	 * @param mapping
 	 * @return the name of the class to use for this type, or {@code null} if no class is available for this type
 	 * @throws CodeGenerationException
 	 */
-	protected ClassName generateInternal(URI type, Mapping mapping) throws CodeGenerationException {
-		// If the mapping wants a primitive type or existing type, do that (ignoring whatever the schema does)
+	protected ClassName generateInternal(URI type, SchemaTree schema, Mapping mapping) throws CodeGenerationException {
+		// 1. If the mapping wants a primitive type or existing type, do that (ignoring whatever the schema does)
 		if (isPrimitive(mapping.getClassName()) || isExistingClass(mapping.getClassName())) {
 			logger.debug("{}: Mapping to existing class/type {}", type, mapping.getClassName());
 			return mapping.getClassName();
 		}
 
 		try {
-			// 1. Find the schema for the type
-			SchemaTree schema = getSchema(getSchemaLoader(), type);
-			if (schema == null || schema.getNode() == null) {
-				throw new MissingSchemaException(type);
-			}
-
 			// 2. Determine the type of the schema
 			String schemaType;
 			JsonNode schemaTypeNode = schema.getNode().get("type");
@@ -282,7 +315,7 @@ public class PojoGenerator extends AbstractGenerator {
 			}
 			
 			return className;
-		} catch (ProcessingException|IOException e) {
+		} catch (IOException e) {
 			throw new CodeGenerationException(type, e);
 		}
 	}
