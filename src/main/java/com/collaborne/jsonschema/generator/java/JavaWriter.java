@@ -86,13 +86,18 @@ public class JavaWriter implements Closeable {
 		}
 		
 		String rawClassName = fqcn.getRawClassName();
-		if (importedClassNames.values().contains(rawClassName)) {
-			// Don't write imports that boil down to the same short form
-			return;
+		if (!importedClassNames.values().contains(rawClassName)) {
+			// Not yet imported, so we can pick this one
+			String importClassName = packageName + "." + rawClassName;
+			importedClassNames.put(importClassName, rawClassName);
 		}
 
-		String importClassName = packageName + "." + rawClassName;
-		importedClassNames.put(importClassName, rawClassName);
+		if (fqcn.getTypeArguments() != null) {
+			// Try importing the type arguments as well
+			for (ClassName typeArgument : fqcn.getTypeArguments()) {
+				writeImport(typeArgument);
+			}
+		}
 	}
 
 	protected void flushImports() throws IOException {
