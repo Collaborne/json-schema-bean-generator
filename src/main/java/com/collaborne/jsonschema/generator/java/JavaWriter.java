@@ -121,8 +121,11 @@ public class JavaWriter implements Closeable {
 		ClassName[] typeArguments = fqcn.getTypeArguments();
 		if (typeArguments != null && typeArguments.length > 0) {
 			sb.append("<");
-			for (ClassName typeArgument : typeArguments) {
-				sb.append(getAvailableShortName(typeArgument));
+			for (int i = 0; i < typeArguments.length; i++) {
+				if (i > 0) {
+					sb.append(",");
+				}
+				sb.append(getAvailableShortName(typeArguments[i]));
 			}
 			sb.append(">");
 		}
