@@ -67,7 +67,9 @@ public final class ClassName {
 		return new ClassName(packageName, rawClassName, typeArguments);
 	}
 	
-	public static ClassName parse(String fqcn) {
+	public static ClassName parse(String value) {
+		String fqcn = value.trim();
+
 		ClassName[] typeArguments;
 		int bracketIndex = fqcn.indexOf('<');
 		if (bracketIndex != -1) {

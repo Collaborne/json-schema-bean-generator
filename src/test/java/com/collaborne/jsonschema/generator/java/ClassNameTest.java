@@ -65,4 +65,20 @@ public class ClassNameTest {
 		assertEquals("Map", className.getRawClassName());
 		assertArrayEquals(new ClassName[] { ClassName.create(String.class) }, className.getTypeArguments());
 	}
+
+	@Test
+	public void parseGenericTypeMultipleTypeArguments() {
+		ClassName className = ClassName.parse("java.util.Map<java.lang.String,java.lang.Integer>");
+		assertEquals("java.util", className.getPackageName());
+		assertEquals("Map", className.getRawClassName());
+		assertArrayEquals(new ClassName[] { ClassName.create(String.class), ClassName.create(Integer.class) }, className.getTypeArguments());
+	}
+
+	@Test
+	public void parseGenericTypeMultipleTypeArgumentsTrimsTypeArguments() {
+		ClassName className = ClassName.parse("java.util.Map< java.lang.String , java.lang.Integer >");
+		assertEquals("java.util", className.getPackageName());
+		assertEquals("Map", className.getRawClassName());
+		assertArrayEquals(new ClassName[] { ClassName.create(String.class), ClassName.create(Integer.class) }, className.getTypeArguments());
+	}
 }
