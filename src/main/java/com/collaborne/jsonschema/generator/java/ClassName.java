@@ -15,13 +15,16 @@
  */
 package com.collaborne.jsonschema.generator.java;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
 
 
-public class ClassName {
+public final class ClassName {
 	public static final ClassName VOID = ClassName.create(Void.TYPE);
 	private final String packageName;
 	private final String rawClassName;
@@ -97,5 +100,20 @@ public class ClassName {
 			appendable.append(">");
 		}
 		return appendable;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash((Object[]) typeArguments) ^ Objects.hash(rawClassName, packageName);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof ClassName)) {
+			return false;
+		}
+
+		ClassName other = (ClassName) obj;
+		return Objects.equals(packageName, other.getPackageName()) && Objects.equals(rawClassName, other.getRawClassName()) && Arrays.equals(typeArguments, other.getTypeArguments());
 	}
 }

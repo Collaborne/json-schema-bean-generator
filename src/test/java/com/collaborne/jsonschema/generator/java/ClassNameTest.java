@@ -19,6 +19,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+
 public class ClassNameTest {
 	private static class TestClass {
 		/* Nothing */
@@ -29,5 +31,12 @@ public class ClassNameTest {
 		ClassName className = ClassName.create(TestClass.class);
 		Class<?> foundClass = Class.forName(className.toString());
 		assertEquals(TestClass.class, foundClass);
+	}
+
+	@Test
+	public void equalsContract() {
+		EqualsVerifier.forClass(ClassName.class)
+			.withPrefabValues(ClassName.class, new ClassName("com.example", "Foo"), new ClassName("com.example.other", "Bar"))
+			.verify();
 	}
 }
