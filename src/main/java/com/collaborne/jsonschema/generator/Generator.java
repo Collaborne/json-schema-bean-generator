@@ -19,7 +19,6 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Map;
 
-import com.collaborne.jsonschema.generator.Generator.Feature;
 import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.model.Mapping;
 import com.github.fge.jsonschema.core.load.SchemaLoader;
