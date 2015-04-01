@@ -139,6 +139,27 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 			propertyGenerator.generateImports(writer);
 		}
 
+		writeSchemaDocumentation(schema, writer);
+		writer.writeClassStart(mapping.getClassName(), mapping.getExtends(), mapping.getImplements(), Kind.CLASS, Visibility.PUBLIC);
+		try {
+			// Write properties
+			for (PojoPropertyGenerator propertyGenerator : propertyGenerators) {
+				propertyGenerator.generateFields(writer);
+			}
+
+			// Write accessors
+			// TODO: style to create them: pairs, or ordered?
+			// TODO: whether to generate setters in the first place, or just getters
+			for (PojoPropertyGenerator propertyGenerator : propertyGenerators) {
+				propertyGenerator.generateGetter(writer);
+				propertyGenerator.generateSetter(writer);
+			}
+		} finally {
+			writer.writeClassEnd();
+		}
+	}
+
+	protected void writeSchemaDocumentation(SchemaTree schema, JavaWriter writer) throws IOException {
 		String title = null;
 		String description = null;
 		if (schema.getNode().hasNonNull("title")) {
@@ -162,23 +183,6 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 				}
 			}
 			writer.writeJavadoc(lines.toArray(new String[lines.size()]));
-		}
-		writer.writeClassStart(mapping.getClassName(), mapping.getExtends(), mapping.getImplements(), Kind.CLASS, Visibility.PUBLIC);
-		try {
-			// Write properties
-			for (PojoPropertyGenerator propertyGenerator : propertyGenerators) {
-				propertyGenerator.generateFields(writer);
-			}
-			
-			// Write accessors
-			// TODO: style to create them: pairs, or ordered? 
-			// TODO: whether to generate setters in the first place, or just getters
-			for (PojoPropertyGenerator propertyGenerator : propertyGenerators) {
-				propertyGenerator.generateGetter(writer);
-				propertyGenerator.generateSetter(writer);
-			}
-		} finally {
-			writer.writeClassEnd();
 		}
 	}
 }
