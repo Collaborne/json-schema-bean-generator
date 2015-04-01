@@ -18,6 +18,7 @@ package com.collaborne.jsonschema.generator.java;
 import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -175,8 +176,12 @@ public class JavaWriter implements Closeable {
 		writer.write(methodName);
 		writer.write(";\n");
 	}
-	
+
 	public void writeClassStart(ClassName fqcn, Kind kind, Visibility visibility) throws IOException {
+		writeClassStart(fqcn, Collections.emptyList(), kind, visibility);
+	}
+
+	public void writeClassStart(ClassName fqcn, List<ClassName> implementedInterfaces, Kind kind, Visibility visibility) throws IOException {
 		flushImports();
 
 		// XXX: visibility in the mapping? options ("all public", "all minimum?")
@@ -188,6 +193,19 @@ public class JavaWriter implements Closeable {
 		writer.write(" ");
 		// XXX: generating generic types won't work with just this
 		writer.write(fqcn.getRawClassName());
+
+		// Write implemented interfaces, if any
+		if (implementedInterfaces != null && !implementedInterfaces.isEmpty()) {
+			writer.write(" ");
+			writer.write("implements");
+			writer.write(" ");
+			for (int i = 0; i < implementedInterfaces.size(); i++) {
+				if (i > 0) {
+					writer.write(", ");
+				}
+				writeClassName(implementedInterfaces.get(i));
+			}
+		}
 		writer.write(" {\n");
 		pushIndentLevel();
 		currentClassNames.push(fqcn);
