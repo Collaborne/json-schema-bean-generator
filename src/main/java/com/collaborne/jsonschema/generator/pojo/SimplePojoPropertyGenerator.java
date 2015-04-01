@@ -23,11 +23,10 @@ import com.collaborne.jsonschema.generator.java.Visibility;
 
 class SimplePojoPropertyGenerator extends AbstractPojoPropertyGenerator {
 	private final ClassName className;
-	private final String propertyName;
 	
 	public SimplePojoPropertyGenerator(ClassName className, String propertyName) {
+		super(propertyName);
 		this.className = className;
-		this.propertyName = propertyName;
 	}
 	
 	@Override
@@ -37,20 +36,20 @@ class SimplePojoPropertyGenerator extends AbstractPojoPropertyGenerator {
 	
 	@Override
 	public void generateFields(JavaWriter writer) throws IOException {
-		writer.writeField(Visibility.PRIVATE, className, propertyName);
+		writer.writeField(Visibility.PRIVATE, className, getPropertyName());
 	}
 
 	@Override
 	public void generateGetter(JavaWriter writer) throws IOException {
-		writer.writeMethodBodyStart(Visibility.PUBLIC, className, getPrefixedPropertyName("get", propertyName));
-		writer.writeCode("return " + propertyName + ";");
+		writer.writeMethodBodyStart(Visibility.PUBLIC, className, getPrefixedPropertyName("get", getPropertyName()));
+		writer.writeCode("return " + getPropertyName() + ";");
 		writer.writeMethodBodyEnd();
 	}
 
 	@Override
 	public void generateSetter(JavaWriter writer) throws IOException {
-		writer.writeMethodBodyStart(Visibility.PUBLIC, ClassName.VOID, getPrefixedPropertyName("set", propertyName), className, "value");
-		writer.writeCode("this." + propertyName + " = value;");
+		writer.writeMethodBodyStart(Visibility.PUBLIC, ClassName.VOID, getPrefixedPropertyName("set", getPropertyName()), className, "value");
+		writer.writeCode("this." + getPropertyName() + " = value;");
 		writer.writeMethodBodyEnd();
 	}
 }

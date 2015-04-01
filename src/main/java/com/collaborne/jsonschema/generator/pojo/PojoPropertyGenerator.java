@@ -20,6 +20,8 @@ import java.io.IOException;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
 
 interface PojoPropertyGenerator {
+	String getPropertyName();
+
 	void generateImports(JavaWriter writer) throws IOException;
 	void generateFields(JavaWriter writer) throws IOException;
 	void generateGetter(JavaWriter writer) throws IOException;

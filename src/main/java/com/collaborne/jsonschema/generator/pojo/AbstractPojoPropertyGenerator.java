@@ -16,6 +16,17 @@
 package com.collaborne.jsonschema.generator.pojo;
 
 abstract class AbstractPojoPropertyGenerator implements PojoPropertyGenerator {
+	private final String propertyName;
+
+	public AbstractPojoPropertyGenerator(String propertyName) {
+		this.propertyName = propertyName;
+	}
+
+	@Override
+	public String getPropertyName() {
+		return propertyName;
+	}
+
 	protected String getPrefixedPropertyName(String prefix, String propertyName) {
 		return prefix + Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1, propertyName.length());
 	}
