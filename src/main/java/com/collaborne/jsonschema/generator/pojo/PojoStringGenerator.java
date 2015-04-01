@@ -17,6 +17,7 @@ package com.collaborne.jsonschema.generator.pojo;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Objects;
 
 import com.collaborne.jsonschema.generator.CodeGenerationException;
 import com.collaborne.jsonschema.generator.java.ClassName;
@@ -122,6 +123,8 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 		default:
 			throw new CodeGenerationException(context.getType(), new IllegalArgumentException("Invalid enum style: " + enumStyle));
 		}
+
+		writer.writeImport(ClassName.create(Objects.class));
 
 		writeSchemaDocumentation(schema, writer);
 		writer.writeClassStart(context.getMapping().getClassName(), enumStyle, Visibility.PUBLIC);
