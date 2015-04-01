@@ -38,7 +38,19 @@ public interface Generator {
 			this.requiredType = requiredType;
 			this.defaultValue = defaultValue;
 		}	
-		
+
+		public String getUri() {
+			return uri;
+		}
+
+		public Class<T> getRequiredType() {
+			return requiredType;
+		}
+
+		public T getDefaultValue() {
+			return defaultValue;
+		}
+
 		protected T get(Map<String, Object> featureMap) {
 			Object v = featureMap.get(uri);
 			return checkCast(v);
