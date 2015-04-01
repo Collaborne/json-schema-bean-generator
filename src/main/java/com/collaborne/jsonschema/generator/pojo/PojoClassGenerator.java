@@ -158,31 +158,4 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 			writer.writeClassEnd();
 		}
 	}
-
-	protected void writeSchemaDocumentation(SchemaTree schema, JavaWriter writer) throws IOException {
-		String title = null;
-		String description = null;
-		if (schema.getNode().hasNonNull("title")) {
-			title = schema.getNode().get("title").textValue();
-		}
-		if (schema.getNode().hasNonNull("description")) {
-			description = schema.getNode().get("description").textValue();
-		}
-		if (title != null || description != null) {
-			// Produce some documentation
-			List<String> lines = new ArrayList<>();
-			if (title != null) {
-				lines.add(title);
-				if (description != null) {
-					lines.add("");
-				}
-			}
-			if (description != null) {
-				for (String descriptionLine : description.split("\n")) {
-					lines.add(descriptionLine);
-				}
-			}
-			writer.writeJavadoc(lines.toArray(new String[lines.size()]));
-		}
-	}
 }

@@ -17,6 +17,8 @@ package com.collaborne.jsonschema.generator.pojo;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.collaborne.jsonschema.generator.CodeGenerationException;
 import com.collaborne.jsonschema.generator.java.ClassName;
@@ -60,5 +62,39 @@ abstract class AbstractPojoTypeGenerator implements PojoTypeGenerator {
 		}
 		
 		return true;
+	}
+
+	/**
+	 * Write javadoc if the {@code schema} contains {@code title} and/or {@code description} information.
+	 *
+	 * @param schema
+	 * @param writer
+	 * @throws IOException
+	 */
+	protected void writeSchemaDocumentation(SchemaTree schema, JavaWriter writer) throws IOException {
+		String title = null;
+		String description = null;
+		if (schema.getNode().hasNonNull("title")) {
+			title = schema.getNode().get("title").textValue();
+		}
+		if (schema.getNode().hasNonNull("description")) {
+			description = schema.getNode().get("description").textValue();
+		}
+		if (title != null || description != null) {
+			// Produce some documentation
+			List<String> lines = new ArrayList<>();
+			if (title != null) {
+				lines.add(title);
+				if (description != null) {
+					lines.add("");
+				}
+			}
+			if (description != null) {
+				for (String descriptionLine : description.split("\n")) {
+					lines.add(descriptionLine);
+				}
+			}
+			writer.writeJavadoc(lines.toArray(new String[lines.size()]));
+		}
 	}
 }
