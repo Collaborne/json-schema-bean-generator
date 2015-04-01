@@ -46,6 +46,18 @@ class PojoCodeGenerationContext {
 		return mapping.getTarget();
 	}
 	
+	/**
+	 * Create a {@link PojoPropertyGenerator} for the given {@code propertyName} and {@code type}.
+	 *
+	 * This method invokes {@link Generator#generate(URI)} for the given {@code type}, and then
+	 * uses {@link #createPropertyGenerator(ClassName, String)} if the generation was successful.
+	 *
+	 * @param type
+	 * @param propertyName
+	 * @return
+	 * @throws CodeGenerationException
+	 * @see {@link #createPropertyGenerator(ClassName, String)}
+	 */
 	public PojoPropertyGenerator createPropertyGenerator(URI type, String propertyName) throws CodeGenerationException {
 		ClassName className = generator.generate(type);
 		if (className == null) {
@@ -54,6 +66,14 @@ class PojoCodeGenerationContext {
 		return createPropertyGenerator(className, propertyName);
 	}
 	
+	/**
+	 * Create a {@link PojoPropertyGenerator} for the given {@code propertyName} and {@code className}.
+	 *
+	 * @param className
+	 * @param propertyName
+	 * @return
+	 * @throws CodeGenerationException
+	 */
 	public PojoPropertyGenerator createPropertyGenerator(ClassName className, String propertyName) throws CodeGenerationException {
 		return new SimplePojoPropertyGenerator(className, propertyName);
 	}
