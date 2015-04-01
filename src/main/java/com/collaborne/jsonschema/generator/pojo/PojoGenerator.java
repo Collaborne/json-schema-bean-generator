@@ -282,7 +282,7 @@ public class PojoGenerator extends AbstractGenerator {
 			}
 			
 			return className;
-		} catch (ProcessingException|JsonPointerException|IOException e) {
+		} catch (ProcessingException|IOException e) {
 			throw new CodeGenerationException(type, e);
 		}
 	}
@@ -366,12 +366,10 @@ public class PojoGenerator extends AbstractGenerator {
 	 * @param uri
 	 * @return
 	 * @throws ProcessingException 
-	 * @throws JsonPointerException 
 	 */
 	// XXX: Should this be the default behavior of SchemaLoader#get()?
-	// XXX: review exceptions
 	@VisibleForTesting
-	protected SchemaTree getSchema(SchemaLoader schemaLoader, URI uri) throws ProcessingException, JsonPointerException {
+	protected SchemaTree getSchema(SchemaLoader schemaLoader, URI uri) throws ProcessingException {
 		String fragment = uri.getFragment();
 		if (fragment == null) {
 			return schemaLoader.get(uri);
@@ -381,8 +379,8 @@ public class PojoGenerator extends AbstractGenerator {
 				JsonPointer pointer = new JsonPointer(fragment);
 				SchemaTree schema = schemaLoader.get(schemaTreeUri);
 				return schema.setPointer(pointer);
-			} catch (URISyntaxException e) {
-				assert false : "Was a URI before, we just removed the fragment";
+			} catch (URISyntaxException|JsonPointerException e) {
+				assert false : "Was a valid before, we split things up!";
 				throw new RuntimeException(e);
 			}
 		}

@@ -32,7 +32,6 @@ import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.model.Mapping;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JsonNodeReader;
-import com.github.fge.jackson.jsonpointer.JsonPointerException;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.load.SchemaLoader;
 import com.github.fge.jsonschema.core.tree.SchemaTree;
@@ -64,7 +63,7 @@ public class PojoGeneratorTest {
 			}
 
 			@Override
-			protected SchemaTree getSchema(SchemaLoader schemaLoader, URI uri) throws ProcessingException, JsonPointerException {
+			protected SchemaTree getSchema(SchemaLoader schemaLoader, URI uri) throws ProcessingException {
 				return schema;
 			}
 		};
@@ -87,7 +86,7 @@ public class PojoGeneratorTest {
 			}
 
 			@Override
-			protected SchemaTree getSchema(SchemaLoader schemaLoader, URI uri) throws ProcessingException, JsonPointerException {
+			protected SchemaTree getSchema(SchemaLoader schemaLoader, URI uri) throws ProcessingException {
 				return schema;
 			}
 		};
