@@ -19,8 +19,10 @@ import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 // TODO: extract interface, this is really the "PrettyJavaWriter"
 // TODO: where should the java-awareness lie? Is this not something on top of the purely syntactic writing of java code? And how far should it go?
@@ -33,6 +35,7 @@ public class JavaWriter implements Closeable {
 	private Stack<ClassName> currentClassNames = new Stack<>();
 	/** Map of all imports: package.rawClassName to rawClassName */
 	private Map<String, String> importedClassNames = new HashMap<>();
+	private boolean importsFlushed = false;
 	
 	public JavaWriter(BufferedWriter writer) {
 		this.writer = writer;
@@ -68,6 +71,9 @@ public class JavaWriter implements Closeable {
 		this.packageName = packageName;
 	}
 	
+	/**
+	 * @throws IOException
+	 */
 	public void writeImport(ClassName fqcn) throws IOException {
 		String packageName = fqcn.getPackageName();
 		if (packageName.isEmpty()) {
@@ -86,16 +92,22 @@ public class JavaWriter implements Closeable {
 		}
 
 		String importClassName = packageName + "." + rawClassName;
-		if (importedClassNames.put(importClassName, rawClassName) != null) {
-			// Don't write the same import twice
+		importedClassNames.put(importClassName, rawClassName);
+	}
+
+	protected void flushImports() throws IOException {
+		if (importsFlushed || importedClassNames.isEmpty()) {
 			return;
 		}
+
+		// Write the imported class names, sorted by name
+		List<String> importClassNames = importedClassNames.keySet().stream().sorted().collect(Collectors.toList());
 		
-		if (importedClassNames.size() == 1) {
-			// First import, write a new line
-			writeEmptyLine();
+		writeEmptyLine();
+		for (String importClassName : importClassNames) {
+			writeImportForce(ClassName.parse(importClassName));
 		}
-		writeImportForce(fqcn);
+		importsFlushed = true;
 	}
 	
 	protected String getAvailableShortName(ClassName fqcn) {
@@ -146,6 +158,7 @@ public class JavaWriter implements Closeable {
 		}
 	}
 	
+	// XXX: This should get collected as well, and flushed in #flushImports()
 	public void writeImport(ClassName fqcn, String methodName) throws IOException {
 		writer.write("import static ");
 		if (!fqcn.getPackageName().isEmpty()) {
@@ -159,6 +172,8 @@ public class JavaWriter implements Closeable {
 	}
 	
 	public void writeClassStart(ClassName fqcn, Kind kind, Visibility visibility) throws IOException {
+		flushImports();
+
 		// XXX: visibility in the mapping? options ("all public", "all minimum?")
 		writeEmptyLine();
 		writeIndent();
