@@ -102,4 +102,64 @@ public class PojoGeneratorTest {
 		Mapping mapping = generator.generateMapping(type);
 		assertEquals(packageName, mapping.getClassName().getPackageName());
 	}
+
+	@Test
+	public void getSchemaTypeReturnsTypeKeyword() throws IOException, CodeGenerationException {
+		URI type = URI.create("http://example.com/#");
+		PojoGenerator generator = new PojoGenerator(null, null, null);
+
+		JsonNode schemaNode = jsonNodeReader.fromReader(new StringReader("{\"type\": \"string\"}"));
+		SchemaTree schema = schemaLoader.load(schemaNode);
+		assertEquals("string", generator.getSchemaType(type, schema));
+	}
+
+	@Test
+	public void getSchemaTypeReturnsObjectForEmptySchema() throws IOException, CodeGenerationException {
+		URI type = URI.create("http://example.com/#");
+		PojoGenerator generator = new PojoGenerator(null, null, null);
+
+		JsonNode schemaNode = jsonNodeReader.fromReader(new StringReader("{}"));
+		SchemaTree schema = schemaLoader.load(schemaNode);
+		assertEquals("object", generator.getSchemaType(type, schema));
+	}
+
+	@Test
+	public void getSchemaTypeReturnsAllOf() throws IOException, CodeGenerationException {
+		URI type = URI.create("http://example.com/#");
+		PojoGenerator generator = new PojoGenerator(null, null, null);
+
+		JsonNode schemaNode = jsonNodeReader.fromReader(new StringReader("{\"allOf\": []}"));
+		SchemaTree schema = schemaLoader.load(schemaNode);
+		assertEquals("allOf", generator.getSchemaType(type, schema));
+	}
+
+	@Test
+	public void getSchemaTypeReturnsAnyOf() throws IOException, CodeGenerationException {
+		URI type = URI.create("http://example.com/#");
+		PojoGenerator generator = new PojoGenerator(null, null, null);
+
+		JsonNode schemaNode = jsonNodeReader.fromReader(new StringReader("{\"anyOf\": []}"));
+		SchemaTree schema = schemaLoader.load(schemaNode);
+		assertEquals("anyOf", generator.getSchemaType(type, schema));
+	}
+
+	@Test
+	public void getSchemaTypeReturnsOneOf() throws IOException, CodeGenerationException {
+		URI type = URI.create("http://example.com/#");
+		PojoGenerator generator = new PojoGenerator(null, null, null);
+
+		JsonNode schemaNode = jsonNodeReader.fromReader(new StringReader("{\"oneOf\": []}"));
+		SchemaTree schema = schemaLoader.load(schemaNode);
+		assertEquals("oneOf", generator.getSchemaType(type, schema));
+	}
+
+	@Test(expected=CodeGenerationException.class)
+	public void getSchemaTypeThrowsCodeGenerationExceptionForMultipleAggregations() throws IOException, CodeGenerationException {
+		URI type = URI.create("http://example.com/#");
+		PojoGenerator generator = new PojoGenerator(null, null, null);
+
+		JsonNode schemaNode = jsonNodeReader.fromReader(new StringReader("{\"allOf\": [], \"anyOf\": [], \"oneOf\": []}"));
+		SchemaTree schema = schemaLoader.load(schemaNode);
+		generator.getSchemaType(type, schema);
+	}
 }

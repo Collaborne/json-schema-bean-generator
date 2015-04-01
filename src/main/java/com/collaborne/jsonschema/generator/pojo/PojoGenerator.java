@@ -265,6 +265,7 @@ public class PojoGenerator extends AbstractGenerator {
 	 * @return the name of the class to use for this type, or {@code null} if no class is available for this type
 	 * @throws CodeGenerationException
 	 */
+	@VisibleForTesting
 	protected ClassName generateInternal(URI type, SchemaTree schema, Mapping mapping) throws CodeGenerationException {
 		// 1. If the mapping wants a primitive type or existing type, do that (ignoring whatever the schema does)
 		if (isPrimitive(mapping.getClassName()) || isExistingClass(mapping.getClassName())) {
@@ -274,16 +275,7 @@ public class PojoGenerator extends AbstractGenerator {
 
 		try {
 			// 2. Determine the type of the schema
-			String schemaType;
-			JsonNode schemaTypeNode = schema.getNode().get("type");
-			if (schemaTypeNode == null) {
-				// FIXME: hyper-schema!
-				logger.warn("{}: Missing type keyword, assuming 'object'", type);
-				schemaType = "object";
-			} else {
-				schemaType = schemaTypeNode.textValue();
-			}
-			
+			String schemaType = getSchemaType(type, schema);
 			if ("null".equals(schemaType)) {
 				// All good, nothing to be done.
 				return null;
@@ -315,6 +307,38 @@ public class PojoGenerator extends AbstractGenerator {
 		} catch (IOException e) {
 			throw new CodeGenerationException(type, e);
 		}
+	}
+
+	@VisibleForTesting
+	protected String getSchemaType(URI type, SchemaTree schema) throws CodeGenerationException {
+		String schemaType;
+		JsonNode schemaTypeNode = schema.getNode().get("type");
+		if (schemaTypeNode == null) {
+			// check whether it is a oneOf/anyOf/allOf
+			Set<String> aggregationTypes = new HashSet<>();
+			if (schema.getNode().hasNonNull("allOf")) {
+				aggregationTypes.add("allOf");
+			}
+			if (schema.getNode().hasNonNull("anyOf")) {
+				aggregationTypes.add("anyOf");
+			}
+			if (schema.getNode().hasNonNull("oneOf")) {
+				aggregationTypes.add("oneOf");
+			}
+
+			if (aggregationTypes.size() > 1) {
+				throw new CodeGenerationException(type, "Cannot combine multiple aggregation types, found " + aggregationTypes);
+			} else if (aggregationTypes.size() == 1) {
+				schemaType = aggregationTypes.iterator().next();
+			} else {
+				// XXX: is assuming "object" ok here, or should this be fatal?
+				logger.warn("{}: Missing type keyword, assuming 'object'", type);
+				schemaType = "object";
+			}
+		} else {
+			schemaType = schemaTypeNode.textValue();
+		}
+		return schemaType;
 	}
 
 	@VisibleForTesting
