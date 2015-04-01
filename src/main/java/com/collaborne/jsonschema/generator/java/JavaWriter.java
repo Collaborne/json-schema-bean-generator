@@ -242,6 +242,10 @@ public class JavaWriter implements Closeable {
 		writer.write(";\n");
 	}
 
+	public void writeConstructorBodyStart(Visibility visibility, ClassName className, Object... typesAndValues) throws IOException {
+		writeMethodBodyStart(visibility, null, className.getRawClassName(), typesAndValues);
+	}
+
 	// FIXME: declaration is really weird, should introduce a dedicated type for (ClassName, String)
 	public void writeMethodBodyStart(Visibility visibility, ClassName className, String methodName, Object... typesAndValues) throws IOException {
 		assert typesAndValues == null || typesAndValues.length % 2 == 0;
@@ -249,8 +253,11 @@ public class JavaWriter implements Closeable {
 		writeIndent();
 		writer.write(visibility.getValue());
 		writer.write(" ");
-		writeClassName(className);
-		writer.write(" ");
+		if (className != null) {
+			// Constructors do not have a return type
+			writeClassName(className);
+			writer.write(" ");
+		}
 		writer.write(methodName);
 		writer.write("(");
 		if (typesAndValues != null) {
