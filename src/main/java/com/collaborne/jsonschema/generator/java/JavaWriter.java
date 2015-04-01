@@ -178,10 +178,10 @@ public class JavaWriter implements Closeable {
 	}
 
 	public void writeClassStart(ClassName fqcn, Kind kind, Visibility visibility) throws IOException {
-		writeClassStart(fqcn, Collections.emptyList(), kind, visibility);
+		writeClassStart(fqcn, Collections.emptyList(), Collections.emptyList(), kind, visibility);
 	}
 
-	public void writeClassStart(ClassName fqcn, List<ClassName> implementedInterfaces, Kind kind, Visibility visibility) throws IOException {
+	public void writeClassStart(ClassName fqcn, List<ClassName> extendedClasses, List<ClassName> implementedInterfaces, Kind kind, Visibility visibility) throws IOException {
 		flushImports();
 
 		// XXX: visibility in the mapping? options ("all public", "all minimum?")
@@ -193,6 +193,19 @@ public class JavaWriter implements Closeable {
 		writer.write(" ");
 		// XXX: generating generic types won't work with just this
 		writer.write(fqcn.getRawClassName());
+
+		// Write extended classes, if any
+		if (extendedClasses != null && !extendedClasses.isEmpty()) {
+			writer.write(" ");
+			writer.write("extends");
+			writer.write(" ");
+			for (int i = 0; i < extendedClasses.size(); i++) {
+				if (i > 0) {
+					writer.write(", ");
+				}
+				writeClassName(extendedClasses.get(i));
+			}
+		}
 
 		// Write implemented interfaces, if any
 		if (implementedInterfaces != null && !implementedInterfaces.isEmpty()) {

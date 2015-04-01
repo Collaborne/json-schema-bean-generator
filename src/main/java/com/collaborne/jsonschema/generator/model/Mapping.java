@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 public class Mapping {
 	private URI target;
 	private ClassName className;
+	private List<ClassName> extendedClasses;
 	private List<ClassName> implementedInterfaces;
 
 	public Mapping() {
@@ -53,6 +54,15 @@ public class Mapping {
 
 	public void setClassName(ClassName className) {
 		this.className = className;
+	}
+
+	public List<ClassName> getExtends() {
+		return extendedClasses;
+	}
+
+	@JsonDeserialize(contentConverter=ClassNameConverter.class)
+	public void setExtends(List<ClassName> extendedClasses) {
+		this.extendedClasses = extendedClasses;
 	}
 
 	public List<ClassName> getImplements() {
