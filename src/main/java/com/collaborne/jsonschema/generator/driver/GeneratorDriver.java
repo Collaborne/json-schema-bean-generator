@@ -140,7 +140,7 @@ public class GeneratorDriver {
 				//      is to produce a reasonable default.
 				logger.warn("Missing baseUri for {}", defaultPackageName);
 			} else {
-				generator.addDefaultPackageName(null, defaultPackageName);
+				generator.addDefaultPackageName(baseUri, defaultPackageName);
 			}
 		}
 	}
