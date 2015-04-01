@@ -81,4 +81,16 @@ public class ClassNameTest {
 		assertEquals("Map", className.getRawClassName());
 		assertArrayEquals(new ClassName[] { ClassName.create(String.class), ClassName.create(Integer.class) }, className.getTypeArguments());
 	}
+
+	@Test
+	public void parseCanParseToStringSimple() {
+		ClassName className = ClassName.create(String.class);
+		assertEquals(className, ClassName.parse(className.toString()));
+	}
+
+	@Test
+	public void parseCanParseToStringTypeArguments() {
+		ClassName className = ClassName.create(java.util.Map.class, ClassName.create(String.class), ClassName.create(Integer.class));
+		assertEquals(className, ClassName.parse(className.toString()));
+	}
 }

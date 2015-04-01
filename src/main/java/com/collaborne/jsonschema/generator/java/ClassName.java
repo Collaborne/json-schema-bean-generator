@@ -126,8 +126,11 @@ public final class ClassName {
 		// Add the type arguments
 		if (typeArguments != null && typeArguments.length > 0) {
 			appendable.append("<");
-			for (ClassName typeArgument : typeArguments) {
-				typeArgument.appendTo(appendable);
+			for (int i = 0; i < typeArguments.length; i++) {
+				if (i > 0) {
+					appendable.append(",");
+				}
+				typeArguments[i].appendTo(appendable);
 			}
 			appendable.append(">");
 		}
