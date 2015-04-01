@@ -15,7 +15,9 @@
  */
 package com.collaborne.jsonschema.generator.java;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
@@ -25,7 +27,7 @@ public class ClassNameTest {
 	private static class TestClass {
 		/* Nothing */
 	}
-	
+
 	@Test
 	public void createWithInnerClassReturnsProperName() throws ClassNotFoundException {
 		ClassName className = ClassName.create(TestClass.class);
@@ -38,5 +40,29 @@ public class ClassNameTest {
 		EqualsVerifier.forClass(ClassName.class)
 			.withPrefabValues(ClassName.class, new ClassName("com.example", "Foo"), new ClassName("com.example.other", "Bar"))
 			.verify();
+	}
+
+	@Test
+	public void parseSimple() {
+		ClassName className = ClassName.parse("java.lang.String");
+		assertEquals("java.lang", className.getPackageName());
+		assertEquals("String", className.getRawClassName());
+		assertNull(className.getTypeArguments());
+	}
+
+	@Test
+	public void parseNoPackageName() {
+		ClassName className = ClassName.parse("String");
+		assertEquals("", className.getPackageName());
+		assertEquals("String", className.getRawClassName());
+		assertNull(className.getTypeArguments());
+	}
+
+	@Test
+	public void parseGenericTypeSingleTypeArgument() {
+		ClassName className = ClassName.parse("java.util.Map<java.lang.String>");
+		assertEquals("java.util", className.getPackageName());
+		assertEquals("Map", className.getRawClassName());
+		assertArrayEquals(new ClassName[] { ClassName.create(String.class) }, className.getTypeArguments());
 	}
 }
