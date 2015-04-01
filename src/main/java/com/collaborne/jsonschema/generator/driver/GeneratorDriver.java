@@ -113,23 +113,25 @@ public class GeneratorDriver {
 	 * @param mappings
 	 */
 	public void addMappings(Mappings mappings) {
-		for (Mapping mapping : mappings.getMappings()) {
-			// Work out the full class name and update the mapping
-			ClassName className = mapping.getClassName();
-			if (className == null) {
-				// TODO: calculate class name from the target
-				mapping.setClassName(className);
+		if (mappings.getMappings() != null) {
+			for (Mapping mapping : mappings.getMappings()) {
+				// Work out the full class name and update the mapping
+				ClassName className = mapping.getClassName();
+				if (className == null) {
+					// TODO: calculate class name from the target
+					mapping.setClassName(className);
+				}
+
+				// Resolve the target against the base URI if given
+				// XXX: otherwise we should use the base URI of the mapping file?
+				URI target;
+				if (mappings.getBaseUri() != null) {
+					target = mappings.getBaseUri().resolve(mapping.getTarget());
+				} else {
+					target = mapping.getTarget();
+				}
+				generator.addMapping(target, mapping);
 			}
-			
-			// Resolve the target against the base URI if given
-			// XXX: otherwise we should use the base URI of the mapping file?
-			URI target;
-			if (mappings.getBaseUri() != null) {
-				target = mappings.getBaseUri().resolve(mapping.getTarget());
-			} else {
-				target = mapping.getTarget();
-			}
-			generator.addMapping(target, mapping);
 		}
 
 		String defaultPackageName = mappings.getDefaultPackageName();
