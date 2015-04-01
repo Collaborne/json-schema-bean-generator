@@ -87,7 +87,7 @@ public class PojoGeneratorTest {
 
 	@Test
 	public void generateMappingForTypeSetsMappingTargetToType() {
-		URI type = URI.create("http://example.com/#" + UUID.randomUUID().toString());
+		URI type = URI.create("http://example.com/#/" + UUID.randomUUID().toString());
 		PojoGenerator generator = new PojoGenerator(null, null, null);
 		Mapping mapping = generator.generateMapping(type);
 		assertEquals(type, mapping.getTarget());
@@ -95,7 +95,7 @@ public class PojoGeneratorTest {
 
 	@Test
 	public void generateMappingUsesDefaultPackageFeature() {
-		URI type = URI.create("http://example.com/#" + UUID.randomUUID().toString());
+		URI type = URI.create("http://example.com/#/" + UUID.randomUUID().toString());
 		PojoGenerator generator = new PojoGenerator(null, null, null);
 		String packageName = "some.package" + UUID.randomUUID().toString();
 		generator.setFeature(PojoGenerator.FEATURE_DEFAULT_PACKAGE_NAME, packageName);

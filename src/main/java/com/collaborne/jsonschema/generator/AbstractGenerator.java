@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.collaborne.jsonschema.generator.model.Mapping;
+import com.github.fge.jackson.jsonpointer.JsonPointer;
+import com.github.fge.jackson.jsonpointer.JsonPointerException;
 import com.github.fge.jsonschema.core.load.SchemaLoader;
 
 public abstract class AbstractGenerator implements Generator {
@@ -55,7 +57,13 @@ public abstract class AbstractGenerator implements Generator {
 
 	@Override
 	public void addDefaultPackageName(URI baseUri, String packageName) {
-		defaultPackageNames.put(baseUri, packageName);
+		URI packageUri;
+		if (baseUri.getFragment() == null) {
+			packageUri = baseUri.resolve("#");
+		} else {
+			packageUri = baseUri;
+		}
+		defaultPackageNames.put(packageUri, packageName);
 	}
 
 	/**
@@ -65,11 +73,33 @@ public abstract class AbstractGenerator implements Generator {
 	 * @return
 	 */
 	public String getDefaultPackageName(URI type) {
-		String defaultPackageName = null;
-		// FIXME: Look up the type in the defaultPackageNames, which requires removing pointer parts
-		//        until we find it.
-		// XXX: We likely should also allow defining default package names for URIs with up to no
-		//      path elements.
+		URI searchUri;
+		if (type.getFragment() == null) {
+			searchUri = type.resolve("#");
+		} else {
+			searchUri = type;
+		}
+
+		String defaultPackageName = defaultPackageNames.get(searchUri);
+		while (defaultPackageName == null && !(searchUri.getFragment().isEmpty() && "/".equals(searchUri.getPath()))) {
+			try {
+				if (!searchUri.getFragment().isEmpty()) {
+					JsonPointer pointer = new JsonPointer(searchUri.getFragment());
+					searchUri = searchUri.resolve("#" + pointer.parent().toString());
+				} else {
+					String path = searchUri.getPath();
+					int lastSlashIndex = path.lastIndexOf('/');
+					searchUri = searchUri.resolve(path.substring(0, lastSlashIndex)).resolve("#" + searchUri.getFragment());
+				}
+
+				defaultPackageName = defaultPackageNames.get(searchUri);
+			} catch (JsonPointerException e) {
+				// Assuming that the type was valid before we shouldn't end up here.
+				// However, that's just half the truth: it is possible to ask for a type with an URI that has a fragment that
+				// cannot be interpreted as a JsonPointer (which starts with '/').
+				throw new IllegalArgumentException("Cannot construct JSON pointer", e);
+			}
+		}
 		if (defaultPackageName == null) {
 			defaultPackageName = getFeature(FEATURE_DEFAULT_PACKAGE_NAME);
 			logger.warn("{}: Using package name {}", type, defaultPackageName);
