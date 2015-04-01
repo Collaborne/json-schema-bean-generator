@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 
 import com.collaborne.jsonschema.generator.AbstractGenerator;
 import com.collaborne.jsonschema.generator.CodeGenerationException;
-import com.collaborne.jsonschema.generator.InvalidRefException;
 import com.collaborne.jsonschema.generator.MissingSchemaException;
 import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
