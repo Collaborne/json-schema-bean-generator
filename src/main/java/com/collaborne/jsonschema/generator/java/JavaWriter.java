@@ -25,9 +25,19 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 // TODO: extract interface, this is really the "PrettyJavaWriter"
 // TODO: where should the java-awareness lie? Is this not something on top of the purely syntactic writing of java code? And how far should it go?
 public class JavaWriter implements Closeable {
+	public interface Block {
+		void execute() throws IOException;
+
+		static Block empty() {
+			return () -> {};
+		}
+	}
+
 	private final BufferedWriter writer;
 	// TODO: allow for different indents (like 4 spaces, 2 spaces, etc)
 	private String indent = "\t";
@@ -232,12 +242,17 @@ public class JavaWriter implements Closeable {
 	}
 	
 	public void writeField(Visibility visibility, ClassName className, String fieldName) throws IOException {
+		writeField(visibility, className, fieldName, Block.empty());
+	}
+
+	public void writeField(Visibility visibility, ClassName className, String fieldName, @Nonnull Block block) throws IOException {
 		writeIndent();
 		write(visibility.getValue());
 		write(" ");
 		writeClassName(className);
 		write(" ");
 		write(fieldName);
+		block.execute();
 		write(";\n");
 	}
 
