@@ -19,16 +19,23 @@ import java.io.IOException;
 
 import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
+import com.collaborne.jsonschema.generator.java.JavaWriter.Block;
 import com.collaborne.jsonschema.generator.java.Visibility;
 
 class SimplePojoPropertyGenerator extends AbstractPojoPropertyGenerator {
 	private final ClassName className;
+	private final String defaultValue;
 	
 	public SimplePojoPropertyGenerator(ClassName className, String propertyName) {
+		this(className, propertyName, null);
+	}
+
+	public SimplePojoPropertyGenerator(ClassName className, String propertyName, String defaultValue) {
 		super(propertyName);
 		this.className = className;
+		this.defaultValue = defaultValue;
 	}
-	
+
 	@Override
 	public void generateImports(JavaWriter writer) throws IOException {
 		writer.writeImport(className);
@@ -36,7 +43,11 @@ class SimplePojoPropertyGenerator extends AbstractPojoPropertyGenerator {
 	
 	@Override
 	public void generateFields(JavaWriter writer) throws IOException {
-		writer.writeField(Visibility.PRIVATE, className, getPropertyName());
+		Block defaultValueBlock = defaultValue == null ? Block.empty() : () -> {
+			writer.write(" = ");
+			writer.write(defaultValue);
+		};
+		writer.writeField(Visibility.PRIVATE, className, getPropertyName(), defaultValueBlock);
 	}
 
 	@Override

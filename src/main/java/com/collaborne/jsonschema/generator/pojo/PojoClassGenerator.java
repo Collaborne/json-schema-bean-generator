@@ -132,12 +132,23 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 		visitProperties(schema, new PropertyVisitor<CodeGenerationException>() {
 			@Override
 			public void visitProperty(String propertyName, URI type, SchemaTree schema) throws CodeGenerationException {
-				visitProperty(propertyName, type);
+				String defaultValue;
+				JsonNode defaultValueNode = schema.getNode().path("default");
+				if (defaultValueNode.isMissingNode() || defaultValueNode.isNull()) {
+					defaultValue = null;
+				} else if (defaultValueNode.isTextual()) {
+					defaultValue = '"' + defaultValueNode.textValue() + '"';
+				} else {
+					defaultValue = defaultValueNode.asText();
+				}
+
+				PojoPropertyGenerator propertyGenerator = context.createPropertyGenerator(type, propertyName, defaultValue);
+				propertyGenerators.add(propertyGenerator);
 			}
 
 			@Override
 			public void visitProperty(String propertyName, URI type) throws CodeGenerationException {
-				propertyGenerators.add(context.createPropertyGenerator(type, propertyName));
+				propertyGenerators.add(context.createPropertyGenerator(type, propertyName, null));
 			}
 		});
 		

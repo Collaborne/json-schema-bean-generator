@@ -50,20 +50,21 @@ class PojoCodeGenerationContext {
 	 * Create a {@link PojoPropertyGenerator} for the given {@code propertyName} and {@code type}.
 	 *
 	 * This method invokes {@link Generator#generate(URI)} for the given {@code type}, and then
-	 * uses {@link #createPropertyGenerator(ClassName, String)} if the generation was successful.
+	 * uses {@link #createPropertyGenerator(ClassName, String, String)} if the generation was successful.
 	 *
 	 * @param type
 	 * @param propertyName
+	 * @param defaultValue the default value, or {@code null} if none.
 	 * @return
 	 * @throws CodeGenerationException
-	 * @see {@link #createPropertyGenerator(ClassName, String)}
+	 * @see {@link #createPropertyGenerator(ClassName, String, String)}
 	 */
-	public PojoPropertyGenerator createPropertyGenerator(URI type, String propertyName) throws CodeGenerationException {
+	public PojoPropertyGenerator createPropertyGenerator(URI type, String propertyName, String defaultValue) throws CodeGenerationException {
 		ClassName className = generator.generate(type);
 		if (className == null) {
 			throw new InvalidTypeReferenceException(type);
 		}
-		return createPropertyGenerator(className, propertyName);
+		return createPropertyGenerator(className, propertyName, defaultValue);
 	}
 	
 	/**
@@ -71,10 +72,11 @@ class PojoCodeGenerationContext {
 	 *
 	 * @param className
 	 * @param propertyName
+	 * @param defaultValue the default value, or {@code null} if none.
 	 * @return
 	 * @throws CodeGenerationException
 	 */
-	public PojoPropertyGenerator createPropertyGenerator(ClassName className, String propertyName) throws CodeGenerationException {
-		return new SimplePojoPropertyGenerator(className, propertyName);
+	public PojoPropertyGenerator createPropertyGenerator(ClassName className, String propertyName, String defaultValue) throws CodeGenerationException {
+		return new SimplePojoPropertyGenerator(className, propertyName, defaultValue);
 	}
 }
