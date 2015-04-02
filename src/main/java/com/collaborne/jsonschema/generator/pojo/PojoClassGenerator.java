@@ -108,7 +108,8 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 		});
 		
 		// Check if "additionalProperties" is a schema as well, if so we need to be able to resolve that one.
-		if (schema.getNode().hasNonNull("additionalProperties")) {
+		JsonNode additionalPropertiesNode = schema.getNode().path("additionalProperties");
+		if (additionalPropertiesNode.isContainerNode()) {
 			SchemaTree additionalPropertiesSchema = schema.append(JsonPointer.of("additionalProperties"));
 			URI additionalPropertiesUri = additionalPropertiesSchema.getLoadingRef().toURI().resolve("#" + additionalPropertiesSchema.getPointer().toString());
 			visitSchema(additionalPropertiesUri, additionalPropertiesSchema, schemaVisitor);
