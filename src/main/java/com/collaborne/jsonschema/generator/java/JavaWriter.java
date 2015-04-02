@@ -327,4 +327,13 @@ public class JavaWriter implements Closeable {
 		writer.write(" */\n");
 		skipNextEmptyLine = true;
 	}
+
+	public void writeAnnotation(ClassName annotation) throws IOException {
+		writeEmptyLine();
+		writeIndent();
+		writer.write("@");
+		writeClassName(annotation);
+		writer.write("\n");
+		skipNextEmptyLine = true;
+	}
 }

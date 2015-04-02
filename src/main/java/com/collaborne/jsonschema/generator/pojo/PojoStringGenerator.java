@@ -63,15 +63,18 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 			writer.writeMethodBodyEnd();
 
 			// Create a nice #toString() that uses the value
+			writer.writeAnnotation(ClassName.create(Override.class));
 			writer.writeMethodBodyStart(Visibility.PUBLIC, stringClassName, "toString");
 			writer.writeCode("return getValue();");
 			writer.writeMethodBodyEnd();
 
 			// Create #hashCode() and #equals()
+			writer.writeAnnotation(ClassName.create(Override.class));
 			writer.writeMethodBodyStart(Visibility.PUBLIC, ClassName.create(Integer.TYPE), "hashCode");
 			writer.writeCode("return Objects.hash(value);");
 			writer.writeMethodBodyEnd();
 
+			writer.writeAnnotation(ClassName.create(Override.class));
 			writer.writeMethodBodyStart(Visibility.PUBLIC, ClassName.create(Boolean.TYPE), "equals", ClassName.create(Object.class), "obj");
 			writer.writeCode(
 					"if (!(obj instanceof " + className.getRawClassName() + ")) {",
