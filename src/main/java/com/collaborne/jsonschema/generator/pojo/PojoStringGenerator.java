@@ -33,16 +33,17 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 		void generateAdditionalCode(JavaWriter writer) throws IOException;
 	}
 
-	private static class ClassEnumGenerator implements EnumGenerator {
+	private static abstract class AbstractEnumGenerator implements EnumGenerator {
 		private final ClassName className;
+		private final Visibility constructorVisibility;
 
-		public ClassEnumGenerator(ClassName className) {
+		protected AbstractEnumGenerator(ClassName className, Visibility constructorVisibility) {
 			this.className = className;
+			this.constructorVisibility = constructorVisibility;
 		}
 
-		@Override
-		public void generateEnumValue(String value, JavaWriter writer) throws IOException {
-			writer.writeCode("public static " + className.getRawClassName() + " " + value.toUpperCase(Locale.ENGLISH) + " = new " + className.getRawClassName() + "(\"" + value + "\");");
+		public ClassName getClassName() {
+			return className;
 		}
 
 		@Override
@@ -54,8 +55,7 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 			writer.writeField(Visibility.PRIVATE, stringClassName, "value");
 
 			// Create the constructor
-			// XXX: Visibility of the constructor should somehow get linked to the additionalProperties or such?
-			writer.writeConstructorBodyStart(Visibility.PUBLIC, className, stringClassName, "value");
+			writer.writeConstructorBodyStart(constructorVisibility, getClassName(), stringClassName, "value");
 			writer.writeCode("this.value = value;");
 			writer.writeMethodBodyEnd();
 
@@ -69,6 +69,23 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 			writer.writeMethodBodyStart(Visibility.PUBLIC, stringClassName, "toString");
 			writer.writeCode("return getValue();");
 			writer.writeMethodBodyEnd();
+		}
+	}
+
+	private static class ClassEnumGenerator extends AbstractEnumGenerator {
+		public ClassEnumGenerator(ClassName className) {
+			// XXX: Visibility of the constructor should somehow get linked to the additionalProperties or such?
+			super(className, Visibility.PUBLIC);
+		}
+
+		@Override
+		public void generateEnumValue(String value, JavaWriter writer) throws IOException {
+			writer.writeCode("public static " + getClassName().getRawClassName() + " " + value.toUpperCase(Locale.ENGLISH) + " = new " + getClassName().getRawClassName() + "(\"" + value + "\");");
+		}
+
+		@Override
+		public void generateAdditionalCode(JavaWriter writer) throws IOException {
+			super.generateAdditionalCode(writer);
 
 			// Create #hashCode() and #equals()
 			writer.writeAnnotation(ClassName.create(Override.class));
@@ -79,23 +96,39 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 			writer.writeAnnotation(ClassName.create(Override.class));
 			writer.writeMethodBodyStart(Visibility.PUBLIC, ClassName.create(Boolean.TYPE), "equals", ClassName.create(Object.class), "obj");
 			writer.writeCode(
-					"if (!(obj instanceof " + className.getRawClassName() + ")) {",
+					"if (!(obj instanceof " + getClassName().getRawClassName() + ")) {",
 					"\treturn false;",
 					"}",
-					"return Objects.equals(value, ((" + className.getRawClassName() + ") obj).value);");
+					"return Objects.equals(value, ((" + getClassName().getRawClassName() + ") obj).value);");
 			writer.writeMethodBodyEnd();
 		}
 	}
 
-	private static class EnumEnumGenerator implements EnumGenerator {
+	private static class EnumEnumGenerator extends AbstractEnumGenerator {
+		private boolean wroteOneValue = false;
+
+		public EnumEnumGenerator(ClassName className) {
+			super(className, Visibility.PRIVATE);
+		}
+
 		@Override
 		public void generateEnumValue(String value, JavaWriter writer) throws IOException {
-			throw new UnsupportedOperationException("PojoStringGenerator.EnumGenerator#generateEnumValue() is not implemented");
+			if (wroteOneValue) {
+				writer.write(",\n");
+			}
+			writer.writeIndent();
+			writer.write(value.toUpperCase(Locale.ENGLISH) + "(\"" + value + "\")");
+			wroteOneValue = true;
 		}
 
 		@Override
 		public void generateAdditionalCode(JavaWriter writer) throws IOException {
-			writer.writeCode(";");
+			assert wroteOneValue : "Invalid code generated: Missing enum values";
+			if (wroteOneValue) {
+				writer.write(";\n");
+			}
+
+			super.generateAdditionalCode(writer);
 		}
 	}
 
@@ -123,7 +156,7 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 			enumGenerator = new ClassEnumGenerator(context.getMapping().getClassName());
 			break;
 		case ENUM:
-			enumGenerator = new EnumEnumGenerator();
+			enumGenerator = new EnumEnumGenerator(context.getMapping().getClassName());
 			break;
 		default:
 			throw new CodeGenerationException(context.getType(), new IllegalArgumentException("Invalid enum style: " + enumStyle));
