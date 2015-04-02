@@ -303,7 +303,7 @@ public class JavaWriter implements Closeable {
 	 * @param fqcn
 	 * @throws IOException 
 	 */
-	protected void writeClassName(ClassName fqcn) throws IOException {
+	public void writeClassName(ClassName fqcn) throws IOException {
 		String className = getAvailableShortName(fqcn);
 		write(className);
 	}
