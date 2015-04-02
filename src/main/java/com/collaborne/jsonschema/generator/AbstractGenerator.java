@@ -81,7 +81,7 @@ public abstract class AbstractGenerator implements Generator {
 		}
 
 		String defaultPackageName = defaultPackageNames.get(searchUri);
-		while (defaultPackageName == null && !(searchUri.getFragment().isEmpty() && "/".equals(searchUri.getPath()))) {
+		while (defaultPackageName == null && !(searchUri.getFragment().isEmpty() && (searchUri.getPath().isEmpty() || "/".equals(searchUri.getPath())))) {
 			try {
 				if (!searchUri.getFragment().isEmpty()) {
 					JsonPointer pointer = new JsonPointer(searchUri.getFragment());
