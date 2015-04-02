@@ -153,10 +153,7 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 		// XXX: "Object" should probably be "whatever our factory/reader would produce"
 		// XXX: Instead an AbstractMap, should we have a standard class in our support library?
 		ClassName additionalPropertiesValueClassName = null;
-		List<ClassName> extendedClasses = new ArrayList<>();
-		if (mapping.getExtends() != null) {
-			extendedClasses.addAll(mapping.getExtends());
-		}
+		ClassName extendedClass = mapping.getExtends();
 		JsonNode additionalPropertiesNode = schema.getNode().path("additionalProperties");
 		if (!additionalPropertiesNode.isMissingNode() && !additionalPropertiesNode.isNull() && !mapping.isIgnoreAdditionalProperties()) {
 			if (additionalPropertiesNode.isBoolean()) {
@@ -184,12 +181,16 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 			}
 
 			if (additionalPropertiesValueClassName != null) {
-				extendedClasses.add(ClassName.create(AbstractMap.class, ClassName.create(String.class), additionalPropertiesValueClassName));
+				if (extendedClass != null) {
+					// FIXME: handle this by using an interface instead
+					throw new CodeGenerationException(context.getType(), "additionalProperties is incompatible with 'extends'");
+				}
+				extendedClass = ClassName.create(AbstractMap.class, ClassName.create(String.class), additionalPropertiesValueClassName);
 			}
 		}
 
 		writeSchemaDocumentation(schema, writer);
-		writer.writeClassStart(mapping.getClassName(), extendedClasses, mapping.getImplements(), Kind.CLASS, Visibility.PUBLIC);
+		writer.writeClassStart(mapping.getClassName(), extendedClass, mapping.getImplements(), Kind.CLASS, Visibility.PUBLIC);
 		try {
 			// Write properties
 			for (PojoPropertyGenerator propertyGenerator : propertyGenerators) {
