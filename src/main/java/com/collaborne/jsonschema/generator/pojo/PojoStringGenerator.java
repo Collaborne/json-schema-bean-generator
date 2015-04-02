@@ -49,10 +49,12 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 		public void generateAdditionalCode(JavaWriter writer) throws IOException {
 			ClassName stringClassName = ClassName.create(String.class);
 
+			// XXX: field should be final
+			writer.writeEmptyLine();
+			writer.writeField(Visibility.PRIVATE, stringClassName, "value");
+
 			// Create the constructor
 			// XXX: Visibility of the constructor should somehow get linked to the additionalProperties or such?
-			// XXX: field should be final
-			writer.writeField(Visibility.PRIVATE, stringClassName, "value");
 			writer.writeConstructorBodyStart(Visibility.PUBLIC, className, stringClassName, "value");
 			writer.writeCode("this.value = value;");
 			writer.writeMethodBodyEnd();
