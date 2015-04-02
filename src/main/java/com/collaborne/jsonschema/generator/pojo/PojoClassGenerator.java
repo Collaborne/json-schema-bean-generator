@@ -191,8 +191,10 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 				writer.writeImport(mapClass);
 				ClassName hashMapClass = ClassName.create(HashMap.class, ClassName.create(String.class), additionalPropertiesValueClassName);
 				writer.writeImport(hashMapClass);
-				ClassName mapEntryClass = ClassName.create(Set.class, ClassName.create(Map.Entry.class, ClassName.create(String.class), additionalPropertiesValueClassName));
+				ClassName mapEntryClass = ClassName.create(Map.Entry.class, ClassName.create(String.class), additionalPropertiesValueClassName);
 				writer.writeImport(mapEntryClass);
+				ClassName setMapEntryClass = ClassName.create(Set.class, mapEntryClass);
+				writer.writeImport(setMapEntryClass);
 			}
 		}
 
@@ -222,9 +224,10 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 			}
 
 			if (additionalPropertiesValueClassName != null) {
-				ClassName mapEntryClass = ClassName.create(Set.class, ClassName.create(Map.Entry.class, ClassName.create(String.class), additionalPropertiesValueClassName));
+				ClassName mapEntryClass = ClassName.create(Map.Entry.class, ClassName.create(String.class), additionalPropertiesValueClassName);
+				ClassName setMapEntryClass = ClassName.create(Set.class, mapEntryClass);
 				writer.writeAnnotation(ClassName.create(Override.class));
-				writer.writeMethodBodyStart(Visibility.PUBLIC, mapEntryClass, "entrySet");
+				writer.writeMethodBodyStart(Visibility.PUBLIC, setMapEntryClass, "entrySet");
 				writer.writeCode("return additionalPropertiesMap.entrySet();");
 				writer.writeMethodBodyEnd();
 			}
