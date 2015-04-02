@@ -304,9 +304,9 @@ public class JavaWriter implements Closeable {
 		writer.write(className);
 	}
 
-	protected void writeEmptyLine() throws IOException {
+	public void writeEmptyLine() throws IOException {
 		if (skipNextEmptyLine) {
-			skipNextEmptyLine = true;
+			skipNextEmptyLine = false;
 			return;
 		}
 
