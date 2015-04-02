@@ -241,7 +241,7 @@ public class PojoGenerator extends AbstractGenerator {
 				if (getFeature(FEATURE_IGNORE_MISSING_TYPES)) {
 					// Assume that a class would have been created.
 					result = mapping.getClassName();
-					logger.warn("{}: Ignoring creation failure, assuming class {} would have been created", result, e);
+					logger.warn("{}: Ignoring creation failure, assuming class {} would have been created", type, result, e);
 				} else {
 					throw e;
 				}
