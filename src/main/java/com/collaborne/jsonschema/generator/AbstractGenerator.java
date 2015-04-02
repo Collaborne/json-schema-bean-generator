@@ -50,7 +50,7 @@ public abstract class AbstractGenerator implements Generator {
 	@Override
 	public void addMapping(URI type, Mapping mapping) {
 		if (!type.isAbsolute()) {
-			logger.warn("{}: Adding mapping for non-absolute type");
+			logger.warn("{}: Adding mapping for non-absolute type", type);
 		}
 		mappings.put(type, mapping);
 	}
