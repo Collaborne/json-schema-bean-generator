@@ -360,12 +360,28 @@ public class PojoGenerator extends AbstractGenerator {
 			fqcn += ".";
 		}
 		fqcn += className.getRawClassName();
-		try {
-			Class.forName(fqcn);
-			return true;
-		} catch (ClassNotFoundException e) {
-			return false;
-		}
+		// We're using the canonical name, which cannot be used with #forName() with
+		// inner classes ('.' would have to be replaced by '$'). So this one tries with the
+		// given name, and then replaces each '.' from the end to see if this ClassName
+		// refers to an inner class.
+		// Note that if this ClassName was created from an actual java.lang.Class we could trust
+		// the package information, and skip replacing in that, but that would fail for
+		// ClassNames created using #parse().
+		int end = fqcn.length();
+		do {
+			try {
+				Class.forName(fqcn);
+				return true;
+			} catch (ClassNotFoundException e) {
+				// Try replacing the next dot
+				int next = fqcn.lastIndexOf('.', end);
+				if (next != -1) {
+					fqcn = fqcn.substring(0, next) + '$' + fqcn.substring(next + 1);
+				}
+				end = next;
+			}
+		} while (end != -1);
+		return false;
 	}
 
 	@VisibleForTesting

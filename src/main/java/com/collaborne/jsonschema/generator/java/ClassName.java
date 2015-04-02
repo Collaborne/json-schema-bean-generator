@@ -57,7 +57,7 @@ public final class ClassName {
 	public static ClassName create(Class<?> actualClass, ClassName... typeArguments) {
 		Package actualPackage = actualClass.getPackage();
 		String packageName = actualPackage == null ? "" : actualPackage.getName();
-		String className = actualClass.getName();
+		String className = actualClass.getCanonicalName();
 		String rawClassName;
 		if (packageName.isEmpty()) {
 			rawClassName = className;

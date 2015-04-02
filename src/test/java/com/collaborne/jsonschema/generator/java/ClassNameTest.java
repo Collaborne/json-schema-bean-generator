@@ -29,10 +29,13 @@ public class ClassNameTest {
 	}
 
 	@Test
-	public void createWithInnerClassReturnsProperName() throws ClassNotFoundException {
+	public void createWithInnerClassReturnsProperName() {
 		ClassName className = ClassName.create(TestClass.class);
-		Class<?> foundClass = Class.forName(className.toString());
-		assertEquals(TestClass.class, foundClass);
+
+		// We want to see the "canonical" name here, i.e. the name that can be used to import
+		// the specific class. Having the (regular) "name" would be nice, but isn't actually needed
+		// as we do not do anything runtime-y with those classes ... yet.
+		assertEquals(TestClass.class.getCanonicalName(), className.toString());
 	}
 
 	@Test
