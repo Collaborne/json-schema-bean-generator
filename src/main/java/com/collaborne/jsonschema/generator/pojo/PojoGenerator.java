@@ -110,7 +110,7 @@ public class PojoGenerator extends AbstractGenerator {
 	/** Whether to ignore constraints (enum-ness, min/max value, etc) on non-"object" types */
 	public static final Feature<Boolean> FEATURE_USE_SIMPLE_PLAIN_TYPES = new Feature<>("http://json-schema-bean-generator.collaborne.com/features/LATEST/pojo/simple-plain-types", Boolean.class, Boolean.FALSE);
 	/** Whether to generate Java 5 {@code enum}s or 'class-with-constants' for JSON schema 'enum's */
-	public static final Feature<Kind> FEATURE_ENUM_STYLE = new Feature<>("http://json-schema-bean-generator.collaborne.com/features/LATEST/pojo/enum-style", Kind.class, Kind.CLASS);
+	public static final Feature<Kind> FEATURE_ENUM_STYLE = new Feature<>("http://json-schema-bean-generator.collaborne.com/features/LATEST/pojo/enum-style", Kind.class, Kind.ENUM);
 
 	/** Sentinel to detect a recursive generation early */
 	private static final ClassName IN_PROGRESS = new ClassName("internal", "IN_PROGRESS");
