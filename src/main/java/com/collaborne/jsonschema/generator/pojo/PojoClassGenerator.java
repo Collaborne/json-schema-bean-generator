@@ -202,7 +202,7 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 				writer.writeField(Visibility.PRIVATE, mapClass, "additionalPropertiesMap", () -> {
 					writer.write(" = new ");
 					writer.writeClassName(hashMapClass);
-					writer.writeCode("();");
+					writer.write("();");
 				});
 			}
 
