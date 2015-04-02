@@ -17,16 +17,20 @@ package com.collaborne.jsonschema.generator.pojo;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.collaborne.jsonschema.generator.CodeGenerationException;
+import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
 import com.collaborne.jsonschema.generator.java.Kind;
 import com.collaborne.jsonschema.generator.java.Visibility;
@@ -140,8 +144,51 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 			propertyGenerator.generateImports(writer);
 		}
 
+		// check whether we need to work with additionalProperties:
+		// - schema can say "yes", or "yes-with-this-type"
+		// - mapping can say "yes", or "ignore"
+		// Ultimately if we have to handle them we let the generated class extend AbstractMap<String, TYPE>,
+		// where TYPE is either the one from the schema, or Object (if the schema didn't specify anything.
+		// XXX: "Object" should probably be "whatever our factory/reader would produce"
+		// XXX: Instead an AbstractMap, should we have a standard class in our support library?
+		ClassName additionalPropertiesValueClassName = null;
+		List<ClassName> extendedClasses = new ArrayList<>();
+		if (mapping.getExtends() != null) {
+			extendedClasses.addAll(mapping.getExtends());
+		}
+		JsonNode additionalPropertiesNode = schema.getNode().path("additionalProperties");
+		if (!additionalPropertiesNode.isMissingNode() && !additionalPropertiesNode.isNull() && !mapping.isIgnoreAdditionalProperties()) {
+			if (additionalPropertiesNode.isBoolean()) {
+				if (additionalPropertiesNode.booleanValue()) {
+					additionalPropertiesValueClassName = ClassName.create(Object.class);
+				}
+			} else {
+				assert additionalPropertiesNode.isContainerNode();
+
+				AtomicReference<ClassName> ref = new AtomicReference<>();
+				SchemaTree additionalPropertiesSchema = schema.append(JsonPointer.of("additionalProperties"));
+				URI additionalPropertiesUri = additionalPropertiesSchema.getLoadingRef().toURI().resolve("#" + additionalPropertiesSchema.getPointer().toString());
+				visitSchema(additionalPropertiesUri, additionalPropertiesSchema, new SchemaVisitor<CodeGenerationException>() {
+					@Override
+					public void visitSchema(URI type, SchemaTree schema) throws CodeGenerationException {
+						visitSchema(type);
+					}
+
+					@Override
+					public void visitSchema(URI type) throws CodeGenerationException {
+						ref.set(context.getGenerator().generate(type));
+					}
+				});
+				additionalPropertiesValueClassName = ref.get();
+			}
+
+			if (additionalPropertiesValueClassName != null) {
+				extendedClasses.add(ClassName.create(AbstractMap.class, ClassName.create(String.class), additionalPropertiesValueClassName));
+			}
+		}
+
 		writeSchemaDocumentation(schema, writer);
-		writer.writeClassStart(mapping.getClassName(), mapping.getExtends(), mapping.getImplements(), Kind.CLASS, Visibility.PUBLIC);
+		writer.writeClassStart(mapping.getClassName(), extendedClasses, mapping.getImplements(), Kind.CLASS, Visibility.PUBLIC);
 		try {
 			// Write properties
 			for (PojoPropertyGenerator propertyGenerator : propertyGenerators) {
@@ -154,6 +201,13 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 			for (PojoPropertyGenerator propertyGenerator : propertyGenerators) {
 				propertyGenerator.generateGetter(writer);
 				propertyGenerator.generateSetter(writer);
+			}
+
+			if (additionalPropertiesValueClassName != null) {
+				writer.writeAnnotation(ClassName.create(Override.class));
+				writer.writeMethodBodyStart(Visibility.PUBLIC, ClassName.create(Set.class, ClassName.create(Map.Entry.class, ClassName.create(String.class), additionalPropertiesValueClassName)), "entrySet");
+				writer.writeCode("throw new UnsupportedOperationException(\"Not implemented\");");
+				writer.writeMethodBodyEnd();
 			}
 		} finally {
 			writer.writeClassEnd();
