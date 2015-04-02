@@ -186,6 +186,13 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 					throw new CodeGenerationException(context.getType(), "additionalProperties is incompatible with 'extends'");
 				}
 				extendedClass = ClassName.create(AbstractMap.class, ClassName.create(String.class), additionalPropertiesValueClassName);
+				writer.writeImport(extendedClass);
+				ClassName mapClass = ClassName.create(Map.class, ClassName.create(String.class), additionalPropertiesValueClassName);
+				writer.writeImport(mapClass);
+				ClassName hashMapClass = ClassName.create(HashMap.class, ClassName.create(String.class), additionalPropertiesValueClassName);
+				writer.writeImport(hashMapClass);
+				ClassName mapEntryClass = ClassName.create(Set.class, ClassName.create(Map.Entry.class, ClassName.create(String.class), additionalPropertiesValueClassName));
+				writer.writeImport(mapEntryClass);
 			}
 		}
 
@@ -215,8 +222,9 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 			}
 
 			if (additionalPropertiesValueClassName != null) {
+				ClassName mapEntryClass = ClassName.create(Set.class, ClassName.create(Map.Entry.class, ClassName.create(String.class), additionalPropertiesValueClassName));
 				writer.writeAnnotation(ClassName.create(Override.class));
-				writer.writeMethodBodyStart(Visibility.PUBLIC, ClassName.create(Set.class, ClassName.create(Map.Entry.class, ClassName.create(String.class), additionalPropertiesValueClassName)), "entrySet");
+				writer.writeMethodBodyStart(Visibility.PUBLIC, mapEntryClass, "entrySet");
 				writer.writeCode("return additionalPropertiesMap.entrySet();");
 				writer.writeMethodBodyEnd();
 			}
