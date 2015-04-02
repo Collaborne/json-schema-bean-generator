@@ -29,6 +29,7 @@ public class Mapping {
 	private ClassName className;
 	private ClassName extendedClass;
 	private List<ClassName> implementedInterfaces;
+	private boolean ignoreAdditionalProperties;
 
 	public Mapping() {
 		// For jackson
@@ -72,6 +73,14 @@ public class Mapping {
 	@JsonDeserialize(contentConverter=ClassNameConverter.class)
 	public void setImplements(List<ClassName> implementedInterfaces) {
 		this.implementedInterfaces = implementedInterfaces;
+	}
+
+	public boolean isIgnoreAdditionalProperties() {
+		return ignoreAdditionalProperties;
+	}
+
+	public void setIgnoreAdditionalProperties(boolean ignoreAdditionalProperties) {
+		this.ignoreAdditionalProperties = ignoreAdditionalProperties;
 	}
 
 	@Override
