@@ -210,6 +210,7 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 				ClassName hashMapClass = ClassName.create(HashMap.class, ClassName.create(String.class), additionalPropertiesValueClassName);
 				writer.writeField(Visibility.PRIVATE, mapClass, "additionalPropertiesMap", () -> {
 					writer.write(" = new ");
+					// XXX: If code generation would know about java 7/8, we could use diamond here
 					writer.writeClassName(hashMapClass);
 					writer.write("()");
 				});
