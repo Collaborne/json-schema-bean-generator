@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -194,6 +195,15 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 			for (PojoPropertyGenerator propertyGenerator : propertyGenerators) {
 				propertyGenerator.generateFields(writer);
 			}
+			if (additionalPropertiesValueClassName != null) {
+				ClassName mapClass = ClassName.create(Map.class, ClassName.create(String.class), additionalPropertiesValueClassName);
+				ClassName hashMapClass = ClassName.create(HashMap.class, ClassName.create(String.class), additionalPropertiesValueClassName);
+				writer.writeField(Visibility.PRIVATE, mapClass, "additionalPropertiesMap", () -> {
+					writer.write(" = new ");
+					writer.writeClassName(hashMapClass);
+					writer.writeCode("();");
+				});
+			}
 
 			// Write accessors
 			// TODO: style to create them: pairs, or ordered?
@@ -206,7 +216,7 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 			if (additionalPropertiesValueClassName != null) {
 				writer.writeAnnotation(ClassName.create(Override.class));
 				writer.writeMethodBodyStart(Visibility.PUBLIC, ClassName.create(Set.class, ClassName.create(Map.Entry.class, ClassName.create(String.class), additionalPropertiesValueClassName)), "entrySet");
-				writer.writeCode("throw new UnsupportedOperationException(\"Not implemented\");");
+				writer.writeCode("return additionalPropertiesMap.entrySet();");
 				writer.writeMethodBodyEnd();
 			}
 		} finally {
