@@ -313,6 +313,7 @@ public class JavaWriter implements Closeable {
 	}
 
 	public void writeJavadoc(String... lines) throws IOException {
+		flushImports();
 		writeEmptyLine();
 		writeIndent();
 		write("/**\n");
