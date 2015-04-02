@@ -48,6 +48,10 @@ public class JavaWriter implements Closeable {
 		writer.close();
 	}
 	
+	public void write(String text) throws IOException {
+		writer.write(text);
+	}
+
 	public void pushIndentLevel() {
 		indentLevel++;
 	}
@@ -58,16 +62,16 @@ public class JavaWriter implements Closeable {
 	
 	public void writeIndent() throws IOException {
 		for (int i = 0; i < indentLevel; i++) {
-			writer.write(indent);
+			write(indent);
 		}
 	}
 	
 	public void writePackage(ClassName fqcn) throws IOException {
 		String packageName = fqcn.getPackageName();
 		if (!packageName.isEmpty()) {
-			writer.write("package ");
-			writer.write(packageName);
-			writer.write(";\n");
+			write("package ");
+			write(packageName);
+			write(";\n");
 		}
 		// Remember for later
 		this.packageName = packageName;
@@ -157,25 +161,25 @@ public class JavaWriter implements Closeable {
 	
 	public void writeImportForce(ClassName fqcn) throws IOException {
 		if (!fqcn.getPackageName().isEmpty()) {
-			writer.write("import ");
-			writer.write(fqcn.getPackageName());
-			writer.write(".");
-			writer.write(fqcn.getRawClassName());
-			writer.write(";\n");
+			write("import ");
+			write(fqcn.getPackageName());
+			write(".");
+			write(fqcn.getRawClassName());
+			write(";\n");
 		}
 	}
 	
 	// XXX: This should get collected as well, and flushed in #flushImports()
 	public void writeImport(ClassName fqcn, String methodName) throws IOException {
-		writer.write("import static ");
+		write("import static ");
 		if (!fqcn.getPackageName().isEmpty()) {
-			writer.write(fqcn.getPackageName());
-			writer.write(".");
+			write(fqcn.getPackageName());
+			write(".");
 		}
-		writer.write(fqcn.getRawClassName());
-		writer.write(".");
-		writer.write(methodName);
-		writer.write(";\n");
+		write(fqcn.getRawClassName());
+		write(".");
+		write(methodName);
+		write(";\n");
 	}
 
 	public void writeClassStart(ClassName fqcn, Kind kind, Visibility visibility) throws IOException {
@@ -188,21 +192,21 @@ public class JavaWriter implements Closeable {
 		// XXX: visibility in the mapping? options ("all public", "all minimum?")
 		writeEmptyLine();
 		writeIndent();
-		writer.write(visibility.getValue());
-		writer.write(" ");
-		writer.write(kind.getValue());
-		writer.write(" ");
+		write(visibility.getValue());
+		write(" ");
+		write(kind.getValue());
+		write(" ");
 		// XXX: generating generic types won't work with just this
-		writer.write(fqcn.getRawClassName());
+		write(fqcn.getRawClassName());
 
 		// Write extended classes, if any
 		if (extendedClasses != null && !extendedClasses.isEmpty()) {
-			writer.write(" ");
-			writer.write("extends");
-			writer.write(" ");
+			write(" ");
+			write("extends");
+			write(" ");
 			for (int i = 0; i < extendedClasses.size(); i++) {
 				if (i > 0) {
-					writer.write(", ");
+					write(", ");
 				}
 				writeClassName(extendedClasses.get(i));
 			}
@@ -210,17 +214,17 @@ public class JavaWriter implements Closeable {
 
 		// Write implemented interfaces, if any
 		if (implementedInterfaces != null && !implementedInterfaces.isEmpty()) {
-			writer.write(" ");
-			writer.write("implements");
-			writer.write(" ");
+			write(" ");
+			write("implements");
+			write(" ");
 			for (int i = 0; i < implementedInterfaces.size(); i++) {
 				if (i > 0) {
-					writer.write(", ");
+					write(", ");
 				}
 				writeClassName(implementedInterfaces.get(i));
 			}
 		}
-		writer.write(" {\n");
+		write(" {\n");
 		pushIndentLevel();
 		currentClassNames.push(fqcn);
 	}
@@ -228,18 +232,18 @@ public class JavaWriter implements Closeable {
 	public void writeClassEnd() throws IOException {
 		popIndentLevel();
 		writeIndent();
-		writer.write("}\n");
+		write("}\n");
 		currentClassNames.pop();
 	}
 	
 	public void writeField(Visibility visibility, ClassName className, String fieldName) throws IOException {
 		writeIndent();
-		writer.write(visibility.getValue());
-		writer.write(" ");
+		write(visibility.getValue());
+		write(" ");
 		writeClassName(className);
-		writer.write(" ");
-		writer.write(fieldName);
-		writer.write(";\n");
+		write(" ");
+		write(fieldName);
+		write(";\n");
 	}
 
 	public void writeConstructorBodyStart(Visibility visibility, ClassName className, Object... typesAndValues) throws IOException {
@@ -251,24 +255,24 @@ public class JavaWriter implements Closeable {
 		assert typesAndValues == null || typesAndValues.length % 2 == 0;
 		writeEmptyLine();
 		writeIndent();
-		writer.write(visibility.getValue());
-		writer.write(" ");
+		write(visibility.getValue());
+		write(" ");
 		if (className != null) {
 			// Constructors do not have a return type
 			writeClassName(className);
-			writer.write(" ");
+			write(" ");
 		}
-		writer.write(methodName);
-		writer.write("(");
+		write(methodName);
+		write("(");
 		if (typesAndValues != null) {
 			for (int i = 0; i < typesAndValues.length; i += 2) {
 				if (i > 0) {
-					writer.write(", ");
+					write(", ");
 				}
 				writeMethodBodyStartFormalArgument((ClassName) typesAndValues[i], (String) typesAndValues[i + 1]);
 			}
 		};
-		writer.write(") {\n");
+		write(") {\n");
 		pushIndentLevel();
 	}
 	
@@ -276,21 +280,21 @@ public class JavaWriter implements Closeable {
 		assert lines != null;
 		for (String line : lines) {
 			writeIndent();
-			writer.write(line);
-			writer.write("\n");
+			write(line);
+			write("\n");
 		}
 	}
 	
 	public void writeMethodBodyEnd() throws IOException {
 		popIndentLevel();
 		writeIndent();
-		writer.write("}\n");
+		write("}\n");
 	}
 	
 	protected void writeMethodBodyStartFormalArgument(ClassName className, String parameterName) throws IOException {
 		writeClassName(className);
-		writer.write(" ");
-		writer.write(parameterName);
+		write(" ");
+		write(parameterName);
 	}
 	
 	/**
@@ -301,7 +305,7 @@ public class JavaWriter implements Closeable {
 	 */
 	protected void writeClassName(ClassName fqcn) throws IOException {
 		String className = getAvailableShortName(fqcn);
-		writer.write(className);
+		write(className);
 	}
 
 	public void writeEmptyLine() throws IOException {
@@ -310,30 +314,30 @@ public class JavaWriter implements Closeable {
 			return;
 		}
 
-		writer.write('\n');
+		write("\n");
 	}
 
 	public void writeJavadoc(String... lines) throws IOException {
 		writeEmptyLine();
 		writeIndent();
-		writer.write("/**\n");
+		write("/**\n");
 		for (String line : lines) {
 			writeIndent();
-			writer.write(" * ");
-			writer.write(line);
-			writer.write("\n");
+			write(" * ");
+			write(line);
+			write("\n");
 		}
 		writeIndent();
-		writer.write(" */\n");
+		write(" */\n");
 		skipNextEmptyLine = true;
 	}
 
 	public void writeAnnotation(ClassName annotation) throws IOException {
 		writeEmptyLine();
 		writeIndent();
-		writer.write("@");
+		write("@");
 		writeClassName(annotation);
-		writer.write("\n");
+		write("\n");
 		skipNextEmptyLine = true;
 	}
 }
