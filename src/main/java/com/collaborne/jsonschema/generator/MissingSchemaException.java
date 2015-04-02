@@ -21,10 +21,10 @@ public class MissingSchemaException extends CodeGenerationException {
 	private static final long serialVersionUID = 1L;
 
 	public MissingSchemaException(URI type) {
-		super(type, null, null);
+		this(type, null);
 	}
 
 	public MissingSchemaException(URI type, Throwable cause) {
-		super(type, null, cause);
+		super(type, "Missing schema for " + type, cause);
 	}
 }
