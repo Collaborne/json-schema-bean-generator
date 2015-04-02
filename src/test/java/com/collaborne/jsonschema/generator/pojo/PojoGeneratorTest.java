@@ -57,7 +57,7 @@ public class PojoGeneratorTest {
 		final AtomicBoolean writeSourceCalled = new AtomicBoolean();
 		PojoGenerator generator = new PojoGenerator(null, null, null) {
 			@Override
-			protected void writeSource(URI type, ClassName className, Buffer buffer) throws java.io.IOException {
+			protected void writeSource(URI type, ClassName className, Buffer buffer) throws IOException {
 				writeSourceCalled.set(true);
 			}
 		};
@@ -75,7 +75,7 @@ public class PojoGeneratorTest {
 		final AtomicBoolean writeSourceCalled = new AtomicBoolean();
 		PojoGenerator generator = new PojoGenerator(null, null, null) {
 			@Override
-			protected void writeSource(URI type, ClassName className, Buffer buffer) throws java.io.IOException {
+			protected void writeSource(URI type, ClassName className, Buffer buffer) throws IOException {
 				writeSourceCalled.set(true);
 			}
 		};
