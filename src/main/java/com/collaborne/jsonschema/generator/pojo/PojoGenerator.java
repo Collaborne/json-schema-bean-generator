@@ -238,6 +238,7 @@ public class PojoGenerator extends AbstractGenerator {
 			try {
 				result = generateInternal(type, schema, mapping);
 			} catch (CodeGenerationException e) {
+				logger.error("{}: Exception while generating, source: {}", type, generationStack);
 				if (getFeature(FEATURE_IGNORE_MISSING_TYPES)) {
 					// Assume that a class would have been created.
 					result = mapping.getClassName();
