@@ -24,7 +24,7 @@
 	<parent>
 		<groupId>com.collaborne</groupId>
 		<artifactId>collaborne-oss-parent</artifactId>
-		<version>2</version>
+		<version>3</version>
 	</parent>
 
 	<name>JSON Schema Bean Generator</name>
@@ -32,6 +32,12 @@
 
 	<inceptionYear>2015</inceptionYear>
 
+	<scm>
+		<url>https://github.com/Collaborne/${project.artifactId}</url>
+		<connection>scm:git:https://github.com/Collaborne/${project.artifactId}.git</connection>
+		<developerConnection>${project.scm.connection}</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
 	<developers>
 		<developer>
 			<id>ankon</id>
