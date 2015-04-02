@@ -29,6 +29,7 @@ import com.github.fge.jsonschema.core.tree.SchemaTree;
 
 public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 	private interface EnumGenerator {
+		void generateImports(JavaWriter writer) throws IOException;
 		void generateEnumValue(String value, JavaWriter writer) throws IOException;
 		void generateAdditionalCode(JavaWriter writer) throws IOException;
 	}
@@ -44,6 +45,11 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 
 		public ClassName getClassName() {
 			return className;
+		}
+
+		@Override
+		public void generateImports(JavaWriter writer) throws IOException {
+			// Nothing by default
 		}
 
 		@Override
@@ -76,6 +82,12 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 		public ClassEnumGenerator(ClassName className) {
 			// XXX: Visibility of the constructor should somehow get linked to the additionalProperties or such?
 			super(className, Visibility.PUBLIC);
+		}
+
+		@Override
+		public void generateImports(JavaWriter writer) throws IOException {
+			super.generateImports(writer);
+			writer.writeImport(ClassName.create(Objects.class));
 		}
 
 		@Override
@@ -162,7 +174,7 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 			throw new CodeGenerationException(context.getType(), new IllegalArgumentException("Invalid enum style: " + enumStyle));
 		}
 
-		writer.writeImport(ClassName.create(Objects.class));
+		enumGenerator.generateImports(writer);
 
 		writeSchemaDocumentation(schema, writer);
 		writer.writeClassStart(context.getMapping().getClassName(), enumStyle, Visibility.PUBLIC);
