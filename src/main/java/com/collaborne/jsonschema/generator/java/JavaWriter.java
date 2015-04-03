@@ -18,7 +18,8 @@ package com.collaborne.jsonschema.generator.java;
 import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -203,6 +204,10 @@ public class JavaWriter implements Closeable {
 	}
 
 	public void writeClassStart(ClassName fqcn, ClassName extendedClass, List<ClassName> implementedInterfaces, Kind kind, Visibility visibility) throws IOException {
+		writeClassStart(fqcn, extendedClass, implementedInterfaces, kind, visibility, EnumSet.noneOf(Modifier.class));
+	}
+
+	public void writeClassStart(ClassName fqcn, ClassName extendedClass, List<ClassName> implementedInterfaces, Kind kind, Visibility visibility, Collection<Modifier> modifiers) throws IOException {
 		ClassName generatedAnnotationClassName = ClassName.create(Generated.class);
 		writeImport(generatedAnnotationClassName);
 		flushImports();
@@ -212,6 +217,12 @@ public class JavaWriter implements Closeable {
 		writeIndent();
 		write(visibility.getValue());
 		write(" ");
+		if (modifiers != null) {
+			for (Modifier modifier : modifiers) {
+				write(modifier.getValue());
+				write(" ");
+			}
+		}
 		write(kind.getValue());
 		write(" ");
 		// XXX: generating generic types won't work with just this
