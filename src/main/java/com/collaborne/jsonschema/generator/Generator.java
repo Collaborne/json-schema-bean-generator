@@ -83,6 +83,15 @@ public interface Generator {
 	// TODO: builder
 	void setOutputDirectory(Path outputDirectory);
 	
+	/**
+	 * Add a mapping for the given {@code type}.
+	 *
+	 * If a mapping already exists for the type, the given mapping will override
+	 * it.
+	 *
+	 * @param type
+	 * @param mapping
+	 */
 	// TODO: builder
 	void addMapping(URI type, Mapping mapping);
 
