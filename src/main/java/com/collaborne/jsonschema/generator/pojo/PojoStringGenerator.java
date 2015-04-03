@@ -178,7 +178,7 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 		enumGenerator.generateImports(writer);
 
 		writeSchemaDocumentation(schema, writer);
-		writer.writeClassStart(wantedGeneratedClassName, enumStyle, Visibility.PUBLIC);
+		writer.writeClassStart(wantedGeneratedClassName, context.getMapping().getExtends(), context.getMapping().getImplements(), enumStyle, Visibility.PUBLIC);
 		try {
 			for (JsonNode enumValue : enumValues) {
 				if (!enumValue.isTextual()) {

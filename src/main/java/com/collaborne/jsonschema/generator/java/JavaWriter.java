@@ -202,10 +202,6 @@ public class JavaWriter implements Closeable {
 		write(";\n");
 	}
 
-	public void writeClassStart(ClassName fqcn, Kind kind, Visibility visibility) throws IOException {
-		writeClassStart(fqcn, null, Collections.emptyList(), kind, visibility);
-	}
-
 	public void writeClassStart(ClassName fqcn, ClassName extendedClass, List<ClassName> implementedInterfaces, Kind kind, Visibility visibility) throws IOException {
 		ClassName generatedAnnotationClassName = ClassName.create(Generated.class);
 		writeImport(generatedAnnotationClassName);
