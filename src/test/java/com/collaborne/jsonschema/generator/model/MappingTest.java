@@ -42,4 +42,11 @@ public class MappingTest {
 		assertEquals(target, mapping.getTarget());
 		assertEquals(className, mapping.getClassName());
 	}
+
+	@Test
+	public void getGeneratedClassNameReturnsClassNameIfNotSet() {
+		ClassName className = new ClassName(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+		Mapping mapping = new Mapping(URI.create("http://example.com/#"), className);
+		assertEquals(className, mapping.getGeneratedClassName());
+	}
 }

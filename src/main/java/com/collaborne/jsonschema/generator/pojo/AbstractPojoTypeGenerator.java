@@ -34,7 +34,7 @@ abstract class AbstractPojoTypeGenerator implements PojoTypeGenerator {
 	
 	@Override
 	public ClassName generate(PojoCodeGenerationContext context, SchemaTree schema, JavaWriter writer) throws IOException, CodeGenerationException {
-		ClassName className = context.getMapping().getClassName();
+		ClassName className = context.getMapping().getGeneratedClassName();
 		writer.writePackage(className);
 
 		generateType(context, schema, writer);

@@ -161,14 +161,15 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 			throw new CodeGenerationException(context.getType(), "Expected 'array' for 'enum', but have " + enumValues);
 		}
 
+		ClassName wantedGeneratedClassName = context.getMapping().getGeneratedClassName();
 		EnumGenerator enumGenerator;
 		Kind enumStyle = context.getGenerator().getFeature(PojoGenerator.FEATURE_ENUM_STYLE);
 		switch (enumStyle) {
 		case CLASS:
-			enumGenerator = new ClassEnumGenerator(context.getMapping().getClassName());
+			enumGenerator = new ClassEnumGenerator(wantedGeneratedClassName);
 			break;
 		case ENUM:
-			enumGenerator = new EnumEnumGenerator(context.getMapping().getClassName());
+			enumGenerator = new EnumEnumGenerator(wantedGeneratedClassName);
 			break;
 		default:
 			throw new CodeGenerationException(context.getType(), new IllegalArgumentException("Invalid enum style: " + enumStyle));
@@ -177,7 +178,7 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 		enumGenerator.generateImports(writer);
 
 		writeSchemaDocumentation(schema, writer);
-		writer.writeClassStart(context.getMapping().getClassName(), enumStyle, Visibility.PUBLIC);
+		writer.writeClassStart(wantedGeneratedClassName, enumStyle, Visibility.PUBLIC);
 		try {
 			for (JsonNode enumValue : enumValues) {
 				if (!enumValue.isTextual()) {

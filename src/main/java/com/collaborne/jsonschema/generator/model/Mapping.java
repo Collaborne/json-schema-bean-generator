@@ -26,7 +26,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 // TODO: decide whether className is FQCN or we have a #getPackage() as well
 public class Mapping {
 	private URI target;
+	/** Name of the class to be used when referencing this type */
 	private ClassName className;
+	/** Name of the class to be generated, if different from {@link #className}. */
+	private ClassName generatedClassName;
 	private ClassName extendedClass;
 	private List<ClassName> implementedInterfaces;
 	private boolean ignoreAdditionalProperties;
@@ -55,6 +58,20 @@ public class Mapping {
 
 	public void setClassName(ClassName className) {
 		this.className = className;
+	}
+
+	@JsonDeserialize(converter=ClassNameConverter.class)
+	public ClassName getGeneratedClassName() {
+		// If the user didn't specify a name for the class to be generated explicitly,
+		// use the one they specified as class name.
+		if (generatedClassName != null) {
+			return generatedClassName;
+		}
+		return getClassName();
+	}
+
+	public void setGeneratedClassName(ClassName generatedClassName) {
+		this.generatedClassName = generatedClassName;
 	}
 
 	public ClassName getExtends() {
