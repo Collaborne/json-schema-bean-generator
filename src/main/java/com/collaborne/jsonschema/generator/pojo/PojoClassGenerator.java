@@ -216,7 +216,7 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 		}
 
 		writeSchemaDocumentation(schema, writer);
-		writer.writeClassStart(mapping.getGeneratedClassName(), extendedClass, mapping.getImplements(), Kind.CLASS, Visibility.PUBLIC);
+		writer.writeClassStart(mapping.getGeneratedClassName(), extendedClass, mapping.getImplements(), Kind.CLASS, Visibility.PUBLIC, mapping.getModifiers());
 		try {
 			// Write properties
 			for (PojoPropertyGenerator propertyGenerator : propertyGenerators) {

@@ -23,6 +23,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
@@ -218,7 +219,12 @@ public class JavaWriter implements Closeable {
 		write(visibility.getValue());
 		write(" ");
 		if (modifiers != null) {
+			Set<Modifier> writtenModifiers = EnumSet.noneOf(Modifier.class);
 			for (Modifier modifier : modifiers) {
+				if (!writtenModifiers.add(modifier)) {
+					logger.warn("Duplicate modifier {} for {}", modifier, fqcn);
+					continue;
+				}
 				write(modifier.getValue());
 				write(" ");
 			}
