@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
+import javax.annotation.Generated;
 import javax.annotation.Nonnull;
 
 // TODO: extract interface, this is really the "PrettyJavaWriter"
@@ -197,10 +198,12 @@ public class JavaWriter implements Closeable {
 	}
 
 	public void writeClassStart(ClassName fqcn, ClassName extendedClass, List<ClassName> implementedInterfaces, Kind kind, Visibility visibility) throws IOException {
+		ClassName generatedAnnotationClassName = ClassName.create(Generated.class);
+		writeImport(generatedAnnotationClassName);
 		flushImports();
 
 		// XXX: visibility in the mapping? options ("all public", "all minimum?")
-		writeEmptyLine();
+		writeAnnotation(generatedAnnotationClassName, '"' + getClass().getCanonicalName() + '"');
 		writeIndent();
 		write(visibility.getValue());
 		write(" ");
@@ -344,10 +347,19 @@ public class JavaWriter implements Closeable {
 	}
 
 	public void writeAnnotation(ClassName annotation) throws IOException {
+		writeAnnotation(annotation, null);
+	}
+
+	public void writeAnnotation(ClassName annotation, String parameters) throws IOException {
 		writeEmptyLine();
 		writeIndent();
 		write("@");
 		writeClassName(annotation);
+		if (parameters != null) {
+			write("(");
+			write(parameters);
+			write(")");
+		}
 		write("\n");
 		skipNextEmptyLine = true;
 	}
