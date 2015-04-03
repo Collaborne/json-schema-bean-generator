@@ -209,6 +209,12 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 			}
 		}
 
+		if (mapping.getImplements() != null) {
+			for (ClassName implementedInterface : mapping.getImplements()) {
+				writer.writeImport(implementedInterface);
+			}
+		}
+
 		writeSchemaDocumentation(schema, writer);
 		writer.writeClassStart(mapping.getClassName(), extendedClass, mapping.getImplements(), Kind.CLASS, Visibility.PUBLIC);
 		try {
