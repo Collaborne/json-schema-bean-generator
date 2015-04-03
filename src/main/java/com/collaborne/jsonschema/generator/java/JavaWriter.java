@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Generated;
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // TODO: extract interface, this is really the "PrettyJavaWriter"
 // TODO: where should the java-awareness lie? Is this not something on top of the purely syntactic writing of java code? And how far should it go?
 public class JavaWriter implements Closeable {
@@ -39,6 +42,7 @@ public class JavaWriter implements Closeable {
 		}
 	}
 
+	private final Logger logger = LoggerFactory.getLogger(JavaWriter.class);
 	private final BufferedWriter writer;
 	// TODO: allow for different indents (like 4 spaces, 2 spaces, etc)
 	private String indent = "\t";
@@ -92,6 +96,11 @@ public class JavaWriter implements Closeable {
 	 * @throws IOException
 	 */
 	public void writeImport(ClassName fqcn) throws IOException {
+		if (importsFlushed) {
+			// Ignore the request with a warning: the generated code will have to use the full name.
+			logger.warn("Cannot add import for " + fqcn + ": imports have been flushed already");
+			return;
+		}
 		String packageName = fqcn.getPackageName();
 		if (packageName.isEmpty()) {
 			// Cannot import from the default package
