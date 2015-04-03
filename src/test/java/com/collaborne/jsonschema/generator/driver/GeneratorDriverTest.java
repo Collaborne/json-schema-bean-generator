@@ -18,6 +18,7 @@ package com.collaborne.jsonschema.generator.driver;
 import static org.junit.Assert.assertFalse;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
@@ -47,5 +48,23 @@ public class GeneratorDriverTest {
 		GeneratorDriver driver = new GeneratorDriver(generator);
 		driver.addMappings(new Mappings());
 		assertFalse(addMappingCalled.get());
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void addMappingsNoClassNameThrowsIllegalArgumentException() {
+		Generator generator = new AbstractGenerator() {
+			@Override
+			public ClassName generate(URI type) throws CodeGenerationException {
+				throw new UnsupportedOperationException("Type1427895891163#generate() is not implemented");
+			}
+		};
+
+		Mapping mapping = new Mapping();
+		mapping.setTarget(URI.create("http://example.com/#"));
+		Mappings mappings = new Mappings();
+		mappings.setMappings(Arrays.asList(mapping));
+
+		GeneratorDriver driver = new GeneratorDriver(generator);
+		driver.addMappings(mappings);
 	}
 }

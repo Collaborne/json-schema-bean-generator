@@ -115,13 +115,6 @@ public class GeneratorDriver {
 	public void addMappings(Mappings mappings) {
 		if (mappings.getMappings() != null) {
 			for (Mapping mapping : mappings.getMappings()) {
-				// Work out the full class name and update the mapping
-				ClassName className = mapping.getClassName();
-				if (className == null) {
-					// TODO: calculate class name from the target
-					mapping.setClassName(className);
-				}
-
 				// Resolve the target against the base URI if given
 				// XXX: otherwise we should use the base URI of the mapping file?
 				URI target;
@@ -130,6 +123,13 @@ public class GeneratorDriver {
 				} else {
 					target = mapping.getTarget();
 				}
+
+				// Work out the full class name and update the mapping
+				ClassName className = mapping.getClassName();
+				if (className == null) {
+					throw new IllegalArgumentException("Mapping for " + target + " must specify at least a 'className'");
+				}
+
 				generator.addMapping(target, mapping);
 			}
 		}
