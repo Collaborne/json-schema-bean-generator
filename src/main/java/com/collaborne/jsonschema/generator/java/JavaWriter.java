@@ -287,11 +287,26 @@ public class JavaWriter implements Closeable {
 
 	// FIXME: declaration is really weird, should introduce a dedicated type for (ClassName, String)
 	public void writeMethodBodyStart(Visibility visibility, ClassName className, String methodName, Object... typesAndValues) throws IOException {
+		writeMethodBodyStart(visibility, EnumSet.noneOf(Modifier.class), className, methodName, typesAndValues);
+	}
+
+	public void writeMethodBodyStart(Visibility visibility, Collection<Modifier> modifiers, ClassName className, String methodName, Object... typesAndValues) throws IOException {
 		assert typesAndValues == null || typesAndValues.length % 2 == 0;
 		writeEmptyLine();
 		writeIndent();
 		write(visibility.getValue());
 		write(" ");
+		if (modifiers != null) {
+			Set<Modifier> writtenModifiers = EnumSet.noneOf(Modifier.class);
+			for (Modifier modifier : modifiers) {
+				if (!writtenModifiers.add(modifier)) {
+					logger.warn("Duplicate modifier {} for {}", modifier, methodName);
+					continue;
+				}
+				write(modifier.getValue());
+				write(" ");
+			}
+		}
 		if (className != null) {
 			// Constructors do not have a return type
 			writeClassName(className);
