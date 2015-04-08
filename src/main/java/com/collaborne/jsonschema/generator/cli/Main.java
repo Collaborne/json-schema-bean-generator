@@ -21,12 +21,15 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.collaborne.jsonschema.generator.CodeGenerationException;
 import com.collaborne.jsonschema.generator.Generator;
 import com.collaborne.jsonschema.generator.driver.GeneratorDriver;
 import com.collaborne.jsonschema.generator.pojo.PojoGenerator;
+import com.github.fge.jsonschema.core.load.SchemaLoader;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -34,6 +37,7 @@ public class Main {
 	public static void main(String... args) throws URISyntaxException, ClassNotFoundException, IOException, CodeGenerationException {
 		List<Path> schemaFiles = new ArrayList<>();
 		List<Path> mappingFiles = new ArrayList<>();
+		Set<URI> types = new HashSet<>();
 		
 		Path baseDirectory = Paths.get(".");
 		
@@ -42,7 +46,7 @@ public class Main {
 		Class<? extends Generator> generatorClass = PojoGenerator.class;
 		for (int i = 0; i < args.length; i++) {
 			if ("--help".equals(args[i]) || "-h".equals(args[i])) {
-				System.out.println("Usage: Main [-h|--help] [--mapping MAPPING-FILE...] [--root URI] [--generator GENERATOR-CLASS] [--output-directory OUTPUT-DIRECTORY] SCHEMA-FILE...");
+				System.out.println("Usage: Main [-h|--help] [--mapping MAPPING-FILE...] [--root URI] [--generator GENERATOR-CLASS] [--output-directory OUTPUT-DIRECTORY] [--type URI...] SCHEMA-FILE...");
 				System.exit(0);
 			} else if ("--root".equals(args[i])) {
 				String root = args[++i];
@@ -59,6 +63,8 @@ public class Main {
 				generatorClass = Class.forName(args[++i]).asSubclass(Generator.class);
 			} else if ("--output-directory".equals(args[i])) {
 				outputDirectory = Paths.get(args[++i]);
+			} else if ("--type".equals(args[i])) {
+				types.add(new URI(args[++i]));
 			} else {
 				schemaFiles.add(baseDirectory.resolve(args[i]));
 			}
@@ -88,8 +94,15 @@ public class Main {
 		for (Path mappingFile : mappingFiles) {
 			driver.addMappings(mappingFile);
 		}
-		driver.run(baseDirectory, rootUri, schemaFiles);
-		
+
+		SchemaLoader schemas = driver.createSchemaLoader(rootUri, baseDirectory, schemaFiles);
+		generator.setSchemaLoader(schemas);
+
+		// Add all implicit types (i.e. one for each schema file with an empty pointer):
+		types.addAll(driver.getInitialTypes(rootUri, baseDirectory, schemaFiles));
+
+		driver.generate(types);
+
 		System.exit(0);
 	}
 }

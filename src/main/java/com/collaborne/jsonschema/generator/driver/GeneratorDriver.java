@@ -21,6 +21,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,7 @@ public class GeneratorDriver {
 	}
 
 	// TODO: should split this, and provide the Set<URI> for the needed types here
+	@Deprecated
 	public void run(Path baseDirectory, URI rootUri, List<Path> schemaFiles) throws IOException, CodeGenerationException {
 		// Load the schemas
 		// XXX: for testing we configure the generator from the outside
@@ -82,9 +84,14 @@ public class GeneratorDriver {
 		Set<URI> initialTypes = getInitialTypes(rootUri, baseDirectory, schemaFiles);
 		generate(initialTypes);
 	}
-	
-	@VisibleForTesting
-	protected void generate(Collection<URI> types) throws CodeGenerationException {
+
+	/**
+	 * Generate code for the given {@code types}.
+	 *
+	 * @param types
+	 * @throws CodeGenerationException
+	 */
+	public void generate(Collection<URI> types) throws CodeGenerationException {
 		for (URI type : types) {
 			ClassName className = generator.generate(type);
 			if (className != null) {
@@ -95,7 +102,7 @@ public class GeneratorDriver {
 	
 	/**
 	 * Add mappings from the given path
-	 * 
+	 *
 	 * @param mappingFile
 	 * @throws IOException
 	 */
@@ -109,7 +116,7 @@ public class GeneratorDriver {
 	
 	/**
 	 * Add mappings
-	 * 
+	 *
 	 * @param mappings
 	 */
 	public void addMappings(Mappings mappings) {
@@ -146,9 +153,16 @@ public class GeneratorDriver {
 			}
 		}
 	}
-	
-	@VisibleForTesting
-	protected Set<URI> getInitialTypes(URI rootUri, Path baseDirectory, List<Path> schemaFiles) {
+
+	/**
+	 * Calculate type URIs for all the given {@code schemaFiles}.
+	 *
+	 * @param rootUri
+	 * @param baseDirectory
+	 * @param schemaFiles
+	 * @return
+	 */
+	public Set<URI> getInitialTypes(URI rootUri, Path baseDirectory, List<Path> schemaFiles) {
 		Set<URI> types = new HashSet<>();
 		URI baseDirectoryUri = baseDirectory.toAbsolutePath().normalize().toUri();
 		for (Path schemaFile : schemaFiles) {
@@ -161,9 +175,32 @@ public class GeneratorDriver {
 		
 		return types;
 	}
+
+	/**
+	 * Create a {@link SchemaLoader} with the provided {@code rootUri} and {@code baseDirectory}.
+	 *
+	 * @param rootUri
+	 * @param baseDirectory
+	 * @return
+	 * @throws IOException
+	 * @see {@link #createSchemaLoader(URI, Path, List)}
+	 */
+	public SchemaLoader createSchemaLoader(URI rootUri, Path baseDirectory) throws IOException {
+		return createSchemaLoader(rootUri, baseDirectory, Collections.emptyList());
+	}
 	
-	@VisibleForTesting
-	protected SchemaLoader createSchemaLoader(URI rootUri, Path baseDirectory, List<Path> schemaFiles) throws IOException {
+	/**
+	 * Create a {@link SchemaLoader} with the provided {@code rootUri} and {@code baseDirectory}.
+	 *
+	 * All schemas from {@code schemaFiles} are pre-loaded into the schema loader.
+	 *
+	 * @param rootUri
+	 * @param baseDirectory
+	 * @param schemaFiles
+	 * @return
+	 * @throws IOException
+	 */
+	public SchemaLoader createSchemaLoader(URI rootUri, Path baseDirectory, List<Path> schemaFiles) throws IOException {
 		URI baseDirectoryUri = baseDirectory.toAbsolutePath().normalize().toUri();
 		
 		// We're not adding a path redirection here, because that changes the path of the loaded schemas to the redirected location.
