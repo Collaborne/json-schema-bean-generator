@@ -16,6 +16,10 @@
 package com.collaborne.jsonschema.generator.pojo;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -23,6 +27,7 @@ import com.collaborne.jsonschema.generator.CodeGenerationException;
 import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
 import com.collaborne.jsonschema.generator.java.Kind;
+import com.collaborne.jsonschema.generator.java.Modifier;
 import com.collaborne.jsonschema.generator.java.Visibility;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.tree.SchemaTree;
@@ -75,10 +80,24 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 			writer.writeMethodBodyStart(Visibility.PUBLIC, stringClassName, "toString");
 			writer.writeCode("return getValue();");
 			writer.writeMethodBodyEnd();
+
+			// Create a #parse() method
+			writer.writeMethodBodyStart(Visibility.PUBLIC, EnumSet.of(Modifier.STATIC), className, "parse", stringClassName, "stringValue");
+			writer.writeCode(
+					"for (" + className + " value : values()) {",
+					"\tif (value.value.equals(stringValue)) {",
+					"\t\treturn value;",
+					"\t}",
+					"}",
+					"throw new IllegalArgumentException(\"Unknown value \" + stringValue);"
+					);
+			writer.writeMethodBodyEnd();
 		}
 	}
 
 	private static class ClassEnumGenerator extends AbstractEnumGenerator {
+		private final List<String> generatedValues = new ArrayList<>();
+
 		public ClassEnumGenerator(ClassName className) {
 			// XXX: Visibility of the constructor should somehow get linked to the additionalProperties or such?
 			super(className, Visibility.PUBLIC);
@@ -88,11 +107,15 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 		public void generateImports(JavaWriter writer) throws IOException {
 			super.generateImports(writer);
 			writer.writeImport(ClassName.create(Objects.class));
+			writer.writeImport(ClassName.create(Arrays.class));
+			writer.writeImport(ClassName.create(List.class));
 		}
 
 		@Override
 		public void generateEnumValue(String value, JavaWriter writer) throws IOException {
-			writer.writeCode("public static " + getClassName().getRawClassName() + " " + value.toUpperCase(Locale.ENGLISH) + " = new " + getClassName().getRawClassName() + "(\"" + value + "\");");
+			String generatedValue = value.toUpperCase(Locale.ENGLISH);
+			generatedValues.add(generatedValue);
+			writer.writeCode("public static " + getClassName().getRawClassName() + " " + generatedValue + " = new " + getClassName().getRawClassName() + "(\"" + value + "\");");
 		}
 
 		@Override
@@ -112,6 +135,18 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 					"\treturn false;",
 					"}",
 					"return Objects.equals(value, ((" + getClassName().getRawClassName() + ") obj).value);");
+			writer.writeMethodBodyEnd();
+
+			// FIXME: Should use an array here, to match Enum#values()
+			ClassName listOfClassName = ClassName.create(List.class, getClassName());
+			writer.writeMethodBodyStart(Visibility.PUBLIC, EnumSet.of(Modifier.STATIC), listOfClassName, "values");
+			writer.writeCode("return Arrays.asList(");
+			writer.pushIndentLevel();
+			for (String generatedValue : generatedValues) {
+				writer.writeCode(generatedValue + ",");
+			}
+			writer.popIndentLevel();
+			writer.writeCode(");");
 			writer.writeMethodBodyEnd();
 		}
 	}
