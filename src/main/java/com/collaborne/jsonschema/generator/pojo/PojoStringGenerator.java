@@ -115,7 +115,7 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 		public void generateEnumValue(String value, JavaWriter writer) throws IOException {
 			String generatedValue = value.toUpperCase(Locale.ENGLISH);
 			generatedValues.add(generatedValue);
-			writer.writeCode("public static " + getClassName().getRawClassName() + " " + generatedValue + " = new " + getClassName().getRawClassName() + "(\"" + value + "\");");
+			writer.writeCode("public static final " + getClassName().getRawClassName() + " " + generatedValue + " = new " + getClassName().getRawClassName() + "(\"" + value + "\");");
 		}
 
 		@Override
