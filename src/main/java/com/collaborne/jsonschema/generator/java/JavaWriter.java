@@ -271,9 +271,24 @@ public class JavaWriter implements Closeable {
 	}
 
 	public void writeField(Visibility visibility, ClassName className, String fieldName, @Nonnull Block block) throws IOException {
+		writeField(visibility, EnumSet.noneOf(Modifier.class), className, fieldName, block);
+	}
+
+	public void writeField(Visibility visibility, Collection<Modifier> modifiers, ClassName className, String fieldName, @Nonnull Block block) throws IOException {
 		writeIndent();
 		write(visibility.getValue());
 		write(" ");
+		if (modifiers != null) {
+			Set<Modifier> writtenModifiers = EnumSet.noneOf(Modifier.class);
+			for (Modifier modifier : modifiers) {
+				if (!writtenModifiers.add(modifier)) {
+					logger.warn("Duplicate modifier {} for {}", modifier, fieldName);
+					continue;
+				}
+				write(modifier.getValue());
+				write(" ");
+			}
+		}
 		writeClassName(className);
 		write(" ");
 		write(fieldName);
