@@ -26,6 +26,7 @@ import java.util.Objects;
 import com.collaborne.jsonschema.generator.CodeGenerationException;
 import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
+import com.collaborne.jsonschema.generator.java.JavaWriter.Block;
 import com.collaborne.jsonschema.generator.java.Kind;
 import com.collaborne.jsonschema.generator.java.Modifier;
 import com.collaborne.jsonschema.generator.java.Visibility;
@@ -61,9 +62,8 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 		public void generateAdditionalCode(JavaWriter writer) throws IOException {
 			ClassName stringClassName = ClassName.create(String.class);
 
-			// XXX: field should be final
 			writer.writeEmptyLine();
-			writer.writeField(Visibility.PRIVATE, stringClassName, "value");
+			writer.writeField(Visibility.PRIVATE, EnumSet.of(Modifier.FINAL), stringClassName, "value", Block.empty());
 
 			// Create the constructor
 			writer.writeConstructorBodyStart(constructorVisibility, getClassName(), stringClassName, "value");
