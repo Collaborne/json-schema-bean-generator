@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -142,8 +143,14 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 			writer.writeMethodBodyStart(Visibility.PUBLIC, EnumSet.of(Modifier.STATIC), listOfClassName, "values");
 			writer.writeCode("return Arrays.asList(");
 			writer.pushIndentLevel();
-			for (String generatedValue : generatedValues) {
-				writer.writeCode(generatedValue + ",");
+			for (Iterator<String> it = generatedValues.iterator(); it.hasNext(); ) {
+				String generatedValue = it.next();
+				writer.writeIndent();
+				writer.write(generatedValue);
+				if (it.hasNext()) {
+					writer.write(",");
+				}
+				writer.write("\n");
 			}
 			writer.popIndentLevel();
 			writer.writeCode(");");
