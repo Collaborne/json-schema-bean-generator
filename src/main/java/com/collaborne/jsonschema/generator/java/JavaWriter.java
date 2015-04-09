@@ -211,6 +211,14 @@ public class JavaWriter implements Closeable {
 	public void writeClassStart(ClassName fqcn, ClassName extendedClass, List<ClassName> implementedInterfaces, Kind kind, Visibility visibility, Collection<Modifier> modifiers) throws IOException {
 		ClassName generatedAnnotationClassName = ClassName.create(Generated.class);
 		writeImport(generatedAnnotationClassName);
+		if (extendedClass != null) {
+			writeImport(extendedClass);
+		}
+		if (implementedInterfaces != null) {
+			for (ClassName implementedInterface : implementedInterfaces) {
+				writeImport(implementedInterface);
+			}
+		}
 		flushImports();
 
 		// XXX: visibility in the mapping? options ("all public", "all minimum?")
