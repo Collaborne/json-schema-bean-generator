@@ -19,6 +19,7 @@ import java.net.URI;
 import java.util.List;
 
 import com.collaborne.jsonschema.generator.java.ClassName;
+import com.collaborne.jsonschema.generator.java.Kind;
 import com.collaborne.jsonschema.generator.java.Modifier;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -35,6 +36,7 @@ public class Mapping {
 	private List<ClassName> implementedInterfaces;
 	private boolean ignoreAdditionalProperties;
 	private List<Modifier> modifiers;
+	private Kind enumStyle;
 
 	public Mapping() {
 		// For jackson
@@ -109,6 +111,15 @@ public class Mapping {
 	@JsonDeserialize(contentConverter=ModifierConverter.class)
 	public void setModifiers(List<Modifier> modifiers) {
 		this.modifiers = modifiers;
+	}
+
+	public Kind getEnumStyle() {
+		return enumStyle;
+	}
+
+	@JsonDeserialize(converter=KindConverter.class)
+	public void setEnumStyle(Kind enumStyle) {
+		this.enumStyle = enumStyle;
 	}
 
 	@Override

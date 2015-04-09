@@ -198,7 +198,10 @@ public class PojoStringGenerator extends AbstractPojoTypeGenerator {
 
 		ClassName wantedGeneratedClassName = context.getMapping().getGeneratedClassName();
 		EnumGenerator enumGenerator;
-		Kind enumStyle = context.getGenerator().getFeature(PojoGenerator.FEATURE_ENUM_STYLE);
+		Kind enumStyle = context.getMapping().getEnumStyle();
+		if (enumStyle == null) {
+			enumStyle = context.getGenerator().getFeature(PojoGenerator.FEATURE_ENUM_STYLE);
+		}
 		switch (enumStyle) {
 		case CLASS:
 			enumGenerator = new ClassEnumGenerator(wantedGeneratedClassName);
