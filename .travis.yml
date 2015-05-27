@@ -6,3 +6,6 @@ env:
   global:
   - secure: DD6kD6dlSbeScPot3Jafqpmwc1PGkhxTW+JeibEiwZ7uctsBwqkuQy7d1XKBF9tbAXZZjfBeYeuzeEv7cxLQqTNNn83MBU+0DYZhVbjLLqmssnSCzSkHfPDCO06/hlySwuX2KGdfoVDpBT9d8esiIMYTSJsYo5n6sknEhl3FVi8=
   - secure: fT5P6Fi1AoixE209+3mbtuAB5852XYAVRWfPmQLMm9Zgg17lHdvxir4hTAO22TtBUnsO5kxUqor3Ru9HVO3bQR7qbptQayhkmjv4jw3Bvr6T5u1ntKPU842EGbjQ6kO7msypo+S/2P3DvpSn+xxn4FvbM6girapeFyUMsRPh5q4=
+caches:
+  directories:
+    - $HOME/.m2/repository
